@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eastcompeace.org.orgmenu.OrgMenuDao">
+	<resultMap id="orgMenuMap" type="OrgMenu">
+		<id column="menu_id" property="menuId"/>
+	    <result column="menu_name" property="menuName"/>
+	    <result column="menu_logo" property="menuLogo"/>
+	    <result column="menu_logo_url" property="menuLogoUrl"/>
+	    <result column="menu_url" property="menuUrl"/>
+	    <result column="menu_type" property="menuType"/>
+	    <result column="menu_order" property="menuOrder"/>
+	    <result column="menu_status" property="menuStatus"/>
+	    <result column="is_default" property="isDefault"/>
+	    <result column="code_name" property="menuTypeName"/>
+	    <result column="background_image" property="backgroundImg"/>
+	    <result column="menu_desc" property="menuDesc"/>
+	</resultMap>
+	
+	<select id="queryMenuList" resultMap="orgMenuMap" parameterType="OrgMenu">
+		SELECT
+			a.menu_id,
+			a.menu_name,
+			a.area_id areaId,
+			ca.area_name areaName,
+			a.menu_logo menuLogo,
+	   		a.menu_url,
+	    	a.menu_type,
+	    	a.menu_order,
+	    	a.background_image,
+	    	CASE a.menu_status
+	    		WHEN '1' THEN '是'
+	    		WHEN '2' THEN '否'
+	    	END menu_status,
+	    	CASE a.is_default
+	    		WHEN '0' THEN '否'
+	    		WHEN '1' THEN '是'
+	    	END is_default,    	
+	    	d.code_name,
+	    	a.menu_desc
+	    FROM
+	    	app_menu a 
+	    	LEFT JOIN conf_area ca 
+	    	ON a.area_id = ca.area_id,
+			common_code_dict d
+    	
+	    WHERE
+	    	a.menu_type = d.code_value AND d.code_type = 'appMenuType'
+	    	<if test="menuTypeName != null and menuTypeName != ''">
+	    		AND d.code_name  LIKE CONCAT('%',#{menuTypeName},'%')		
+	    	</if>	
+		    <if test="areaId!=null and areaId!=''">
+			    AND a.area_id=#{areaId}
+		    </if>	    	
+	    	<if test="menuId != null and menuId != ''">
+	    		AND a.menu_id = #{menuId}
+	    	</if>
+	    	<if test="menuName != null and menuName != ''">
+	    		AND a.menu_name  LIKE CONCAT('%',#{menuName},'%')		
+	    	</if>	
+			<if test="menuType != null and menuType != ''">
+	    		AND a.menu_type = #{menuType}
+	    	</if>	
+	    	<if test="isDefault != null and isDefault != ''">
+	    		AND a.is_default = #{isDefault}
+	    	</if>
+	    	<if test="menuStatus != null and menuStatus != ''">
+	    		AND a.menu_status = #{menuStatus}
+	    	</if>
+	    ORDER BY d.code_name
+	</select>
+	
+	<insert id="addMenu" parameterType="OrgMenu">
+		INSERT INTO
+			app_menu(
+				background_image,
+				menu_name,
+			    menu_logo,
+			    area_id,
+			    menu_url,
+			    menu_type,
+			    menu_order,
+			    menu_status,
+			    is_default,
+			    menu_logo_url,
+			    menu_desc		
+			) VALUES(
+				#{backgroundImg},
+				#{menuName},
+			    #{menuLogo},
+			    #{areaId},
+			    #{menuUrl},
+			    #{menuType},
+			    #{menuOrder},
+			    #{menuStatus},
+			    #{isDefault},
+			    #{menuLogoUrl},
+			    #{menuDesc}
+			)
+	</insert>
+	
+	<update id="updateMenu" parameterType="OrgMenu">
+		UPDATE app_menu				
+		<trim prefix="SET" suffixOverrides=",">   
+			<if test="menuName != null and menuName != ''">
+				menu_name = #{menuName},
+			</if>
+			<if test="menuLogo != null and menuLogo != ''">
+				menu_logo = #{menuLogo},
+			</if>
+			<if test="areaId!=null and areaId!=''">
+				area_id = #{areaId},
+			</if>			
+			<if test="menuLogoUrl != null and menuLogoUrl != ''">
+				menu_logo_url = #{menuLogoUrl},
+			</if>
+			<if test="backgroundImg != null and backgroundImg != ''">
+				background_image = #{backgroundImg},
+			</if>
+			<if test="menuUrl != null and menuUrl != ''">
+				menu_url = #{menuUrl},
+			</if>
+			<if test="menuType != null and menuType != ''">
+				menu_type = #{menuType},
+			</if>
+			<if test="menuOrder != null and menuOrder != ''">
+				menu_order = #{menuOrder},
+			</if>
+			<if test="menuStatus != null and menuStatus != ''">
+				menu_status = #{menuStatus},
+			</if>
+			<if test="isDefault != null and isDefault != ''">
+				is_default = #{isDefault},
+			</if>	
+				menu_desc = #{menuDesc}	
+		</trim>
+		WHERE
+			menu_id = #{menuId}	
+	</update>
+	
+	<delete id="delMenu" parameterType="list">
+		DELETE FROM 
+			app_menu 
+		WHERE 
+			menu_id 
+		IN
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<select id="queryMenuByList" parameterType="list" resultMap="orgMenuMap">
+		SELECT 		
+			background_image	
+		FROM 
+			app_menu
+		WHERE 
+			menu_id IN
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="queryMenuListForCombobox" resultMap="orgMenuMap" parameterType="OrgMenu">
+		SELECT
+			menu_id,
+			menu_name		
+	    FROM
+	    	app_menu
+	    WHERE   	
+	    	menu_status = #{menuStatus}
+	</select>
+</mapper>

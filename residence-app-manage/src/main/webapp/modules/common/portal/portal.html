@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>居住证APP管理系统</title>
+<meta http-equiv="pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
+<link rel="shortcut icon" href="../../../resources/images/favicon.ico" />
+<link rel="stylesheet" type="text/css" href="../../../resources/js/library/jquery/easyui-1.4.2/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../../resources/js/library/jquery/easyui-1.4.2/themes/icon.css"/>
+<link rel="stylesheet" type="text/css" href="../../../modules/common/portal/style/portal.css" />
+<script language="javascript" type="text/javascript" src="../../../resources/js/library/jquery/jquery-1.11.1.min.js"></script>
+<script language="javascript" type="text/javascript" src="../../../resources/js/library/jquery/easyui-1.4.2/jquery.easyui.min.js"></script>
+<script language="javascript" type="text/javascript" src="../../../resources/js/library/jquery/easyui-1.4.2/locale/easyui-lang-zh_CN.js"></script>
+<script language="javascript" type="text/javascript" src="../../../resources/js/library/jseasy/Date.js"></script>
+<script language="javascript" type="text/javascript" src="../../../resources/js/library/md5-min.js"></script>
+<script language="javascript" type="text/javascript" src="../../../config.js"></script>
+<script language="javascript" type="text/javascript" src="../../../resources/js/common.js"></script>
+<script language="javascript" type="text/javascript" src="../../../modules/common/portal/js/portal.js"></script>
+<script language="javascript" type="text/javascript" src="../../../modules/common/portal/js/modifyUserPwd.js"></script>
+<script language="javascript" type="text/javascript" src="../../../modules/common/portal/js/passwordstrength.js/"></script>
+</head>
+<body class="easyui-layout">
+<div data-options="region:'north'" class="ui-top">
+	<div class="logo"><img src="images/top-logo.png" title="物业业务管理平台"/></div>
+	<div class="right">
+		<ul>
+			<li><span><img src="images/top-help.png" title="帮助"/></span><a id="help" href="javascript:void(0);">帮助</a></li>
+			<li><a href="javascript:void(0);" id="passwordModify">修改密码</a></li>
+			<li><a href="javascript:void(0);" id="logout">退出</a></li>
+		</ul>
+		<div class="user">
+			<span id="userName">NaN</span>
+			<i id="date"></i>
+		</div>
+	</div>
+</div>
+<div data-options="region:'west',split:false,collapsible:true" title="导航菜单" class="ui-left">
+	<dl class="menu" id="menu"></dl>
+</div>
+<div data-options="region:'center'">
+	<div data-options="fit:true,border:false" class="easyui-tabs" id="tabs">
+		<div title="首页">
+			<iframe src="../homepage/homePage.jsp" width="100%" marginwidth="0" height="100%" marginheight="0" align="middle" scrolling="yes" frameborder="0"></iframe>
+		</div>
+	</div>
+</div>
+<div data-options="region:'south'" class="ui-bottom">Copyright 2017-2018&nbsp;&copy;浙江省居住证管理平台 </a>（v1.0 Build 20170306）</div>
+<div id="mm" class="easyui-menu cs-tab-menu none">
+	<div id="mm-tabupdate" data-options="iconCls:'icon-reload'">刷新</div>
+	<div class="menu-sep"></div>
+	<div id="mm-tabclose">关闭</div>
+	<div id="mm-tabcloseother">关闭其他</div>
+	<div id="mm-tabcloseall">关闭全部</div>
+</div>
+<!-- 修改密码  -->
+<div id="divWindow" style="padding:10px;">
+	<form name="addForm" id="addForm" method="post" action="">
+		<table align="center" cellpadding="0" cellspacing="1" width="100%" class="tab">	
+			<tr>
+				<td align="right" width="100">原始密码：</td>
+				<td align="left"><input type="password" name="initialPwd" id="initialPwd" class="easyui-textbox"size="30" maxlength="10" />&nbsp;<font color="red">*</font></td>
+			</tr>
+			<tr>
+				<td align="right">新密码：</td>
+				<td align="left"><input type="password" name="newPwd" id="newPwd" size="30" maxlength="10" class="easyui-textbox"  />&nbsp;<font color="red">*</font><span style="color:red;">密码须由特殊字符、字母、数字组成。</span></td>
+			</tr>
+			<tr>
+				<td align="right">密码强度:</td>
+				<td align="left" style="line-height:16px;"><script type="text/javascript">var ps = new PasswordStrength();ps.setMinLength(5);</script></td>
+			</tr>
+			<tr>
+				<td align="right">确认密码：</td>
+				<td align="left"><input type="password" name="confirmPwd" id="confirmPwd" class="easyui-textbox"  size="30" maxlength="10" />&nbsp;<font color="red">*</font></td>
+			</tr>
+			<tr>
+				<td align="center" colspan="2">
+					<input type="button" name="btnSave" id="btnSave" class="button1" value="保存" />&nbsp;
+					<input type="button" name="btnCancel" id="btnCancel" class="button1" value="取消" />
+				</td>
+			</tr>
+		</table>
+		<div>
+			<ul><li id="messageTips" style="color:red;line-height:28px;"></li></ul>
+		</div>
+	</form>
+</div>
+</body>
+</html>

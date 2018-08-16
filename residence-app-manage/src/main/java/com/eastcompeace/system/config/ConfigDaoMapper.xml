@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace value ： 实现的DAO接口的路径 -->
+<mapper namespace="com.eastcompeace.system.config.ConfigDao">
+
+	<!-- resultMap:定义结果集中表字段与实体类属性的映射关系 -->
+	<resultMap type="Config" id="configMap">
+		<!-- common_config表与实体类映射字段 -->
+		<result column="param_id" property="paramId" />
+		<result column="param_name" property="paramName" />
+		<result column="param_value" property="paramValue" />
+		<result column="param_desc" property="paramDesc" />
+		<result column="param_valid" property="paramValid" />
+		<result column="modify_date" property="modifyDate" />
+		<result column="up_imgsrc" property="upImgsrc" />
+	</resultMap>
+
+	<select id="queryConfigList" resultType="Config" parameterType="Config">
+		SELECT 	t.param_id paramId,
+			   	t.param_name paramName,
+			   	t.param_value paramValue,
+			   	t.param_desc paramDesc,
+			   	t.param_valid paramValid,
+		CASE   	t.param_valid
+		WHEN 	'VALID' 
+		THEN  	'有效'
+		WHEN  	'INVALID' 
+		THEN    '失效'
+		END 	paramValidVal,
+				t.modify_date modifyDate,
+			   	t.up_imgsrc upImgsrc
+		FROM 	common_config t
+		where 1=1
+		<if test="paramName!=null and paramName!='' ">
+			and t.param_name like concat('%',#{paramName},'%')
+		</if>
+		<if test="paramValue!=null and paramValue!='' ">
+			and t.param_value like concat('%',#{paramValue},'%')
+		</if>
+	</select>
+
+	<insert id="insertConfig" useGeneratedKeys="true" keyProperty="id">
+		insert into common_config (
+		param_name
+		<if test="paramValue!=null and paramValue!='' ">
+			,param_value
+		</if>
+		<if test="paramDesc!=null and paramDesc!='' ">
+			,param_desc
+		</if>
+		<if test="paramValid!=null and paramValid!='' ">
+			,param_valid
+		</if>
+		,modify_date
+		<if test="upImgsrc!=null and upImgsrc!='' ">
+			,up_imgsrc
+		</if>
+		)values(
+		#{paramName}
+		<if test="paramValue!=null and paramValue!='' ">
+			,#{paramValue}
+		</if>
+		<if test="paramDesc!=null and paramDesc!='' ">
+			,#{paramDesc}
+		</if>
+		<if test="paramValid!=null and paramValid!='' ">
+			,#{paramValid}
+		</if>
+		,sysdate()
+		<if test="upImgsrc!=null and upImgsrc!='' ">
+			,#{upImgsrc}
+		</if>
+		)
+	</insert>
+	
+	<update id="updateConfig" parameterType="Config">
+		update common_config
+		<set>
+			<if test="paramName!=null and paramName!=''">
+				param_name = #{paramName},
+			</if>
+			<if test="paramValue!=null and paramValue!=''">
+				 param_value = #{paramValue},
+			</if>
+			<if test="paramDesc!=null and paramDesc!=''">
+				param_desc = #{paramDesc},
+			</if>
+			<if test="paramValid!=null and paramValid!=''">
+				param_valid=#{paramValid},
+			</if>
+			<if test="modifyDate!=null and modifyDate!=''">
+				modify_date=str_to_date(#{modifyDate},'%Y-%m-%d%H:%i:%s'),
+			</if>
+			<if test="upImgsrc!=null and upImgsrc!='' ">
+				up_imgsrc=#{upImgsrc}
+			</if>
+		</set>
+		where param_id =#{paramId}
+	</update>
+	
+	<delete id="deleteConfig">
+		delete from common_config where param_id = #{0}
+	</delete>
+</mapper>

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eastcompeace.pubmerchantIndex.PubMerchantIndexDao">
+	<resultMap id="pubmerchantIndexMap" type="PubMerchantIndex">
+		<id column="merchant_index_id" property="merchantIndexId" />
+		<result column="merchant_index_title" property="merchantIndexTitle" />
+		<result column="issue_time" property="issueTime" />
+		<result column="merchant_index_pic" property="merchantIndexPic" />
+		<result column="user_id" property="userId" />
+		<result column="user_name" property="userName" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="merchant_index_desc" property="merchantIndexDesc" />
+		<result column="link" property="link" />
+		<result column="rank" property="rank" />
+	</resultMap>
+	<select id="selmerchantIndex" resultMap="pubmerchantIndexMap" parameterType="PubMerchantIndex">
+		select
+			pt.merchant_index_id merchantIndexId,
+			pt.merchant_index_title merchantIndexTitle,
+			date_format( pt.issue_time  ,'%Y-%m-%d ')  issueTime,
+			pt.merchant_index_pic merchantIndexPic,
+			pt.user_id userId,
+			pt.merchant_index_desc merchantIndexDesc,
+			date_format( pt.create_time  ,'%Y-%m-%d ')  createTime,
+			date_format( pt.update_time  ,'%Y-%m-%d ')  updateTime,
+			CASE pt.merchant_index_type
+			WHEN 0 THEN '功能介绍'
+			WHEN 1 THEN '旅游文章'
+			END merchantIndexType,			
+	        co.USER_NAME userName,
+			link link,
+			rank rank
+		from pub_merchant_index pt
+			left join common_user co
+			on pt.user_id=co.User_Id
+		where 1=1
+		<if test="merchantIndexId != null and merchantIndexId != ''">
+			and pt.merchant_index_id = #{merchantIndexId}
+		</if>
+		<if test="merchantIndexType != null and merchantIndexType != ''">
+			and pt.merchant_index_type LIKE CONCAT('%',#{merchantIndexType},'%')
+		</if>
+		<if test="merchantIndexTitle != null and merchantIndexTitle != ''">
+			and pt.merchant_index_title LIKE  CONCAT('%',#{merchantIndexTitle},'%')
+		</if>
+		<if test="issueTime !=null and issueTime != ''">
+			and pt.issue_time=#{issueTime}
+		</if>
+		<if test="createTime !=null and createTime != ''">
+			and date_format( pt.create_time  ,'%Y-%m-%d') = #{createTime}
+		</if>	
+		order by rank	
+	</select>
+
+	<insert id="addmerchantIndex" parameterType="PubMerchantIndex" keyProperty="merchantIndexId">
+		<selectKey keyProperty='merchantIndexId' resultType='int' order='AFTER'  >  
+        	select LAST_INSERT_ID();  
+    	</selectKey>  
+		insert into pub_merchant_index
+		(
+		<if test="merchantIndexType != null and merchantIndexType != ''">
+		merchant_index_type,
+		</if>
+		<if test="merchantIndexTitle != null and merchantIndexTitle != ''">
+		merchant_index_title,
+		</if>
+		<if test="link != null and link != ''">
+		link,
+		</if>
+		<if test="issueTime != null and issueTime != ''">
+		issue_time,
+		</if>
+		<if test="merchantIndexPic != null and merchantIndexPic != ''">
+		merchant_index_pic,
+		</if>
+		<if test="userId != null and userId != ''">
+		user_id,
+		</if>
+		<if test="createTime != null and createTime != ''">
+		create_time,
+		</if>
+		<if test="merchantIndexDesc != null and merchantIndexDesc  != ''">
+		merchant_index_desc,
+		</if>
+		<if test="rank != null and rank  != ''">
+		rank
+		</if>		
+		)
+		value(
+		<if test="merchantIndexType != null and merchantIndexType != ''">
+		#{merchantIndexType},
+		</if>
+		<if test="merchantIndexTitle != null and merchantIndexTitle != ''">
+		#{merchantIndexTitle},
+		</if>
+		<if test="link != null and link != ''">
+		#{link},
+		</if>
+		<if test="issueTime != null and issueTime != ''">
+		#{issueTime},
+		</if>
+		<if test="merchantIndexPic != null and merchantIndexPic != ''">
+		#{merchantIndexPic},
+		</if>
+		<if test="userId != null and userId != ''">
+		#{userId},
+		</if>
+		<if test="createTime != null and createTime != ''">
+		#{createTime},
+		</if>
+		<if test="merchantIndexDesc != null and merchantIndexDesc  != ''">
+		#{merchantIndexDesc},
+		</if>
+		<if test="rank != null and rank  != ''">
+		#{rank}
+		</if>		
+		)
+	</insert>
+	
+	<delete id="delmerchantIndex" parameterType="list">
+		delete from pub_merchant_index where merchant_index_id in
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	<update id="editmerchantIndex" parameterType="PubMerchantIndex">
+		update pub_merchant_index set
+		<if test="merchantIndexTitle !=null and merchantIndexTitle != ''">
+				merchant_index_title=#{merchantIndexTitle}
+		</if>
+		<if test="link !=null and link != ''">
+				,link=#{link}
+		</if>	
+		<if test="merchantIndexPic !=null and merchantIndexPic != ''">
+				,merchant_index_pic=#{merchantIndexPic}
+		</if>
+		<if test="updateTime !=null and updateTime != ''">
+				,update_time=#{updateTime}
+		</if>
+		<if test="merchantIndexDesc != null and merchantIndexDesc != ''">
+				,merchant_index_desc = #{merchantIndexDesc}
+		</if>
+		<if test="merchantIndexType != null and merchantIndexType != ''">
+				,merchant_index_type = #{merchantIndexType}
+		</if>
+		<if test="rank != null and rank != ''">
+				,rank = #{rank}
+		</if>		
+		where merchant_index_id=#{merchantIndexId}
+	</update>	
+	<select id="querycontent" resultMap="pubmerchantIndexMap" parameterType="java.lang.String">
+		SELECT t.merchant_index_content FROM pub_merchant_index t WHERE t.merchant_index_id = #{1}
+	</select>
+	   
+	 <select id="queryMerchantIndexPic" resultMap="pubmerchantIndexMap" parameterType="list">
+	 	SELECT
+	 		merchant_index_id,
+	 		merchant_index_pic
+	 	FROM 
+	 		pub_merchant_index 
+	 	WHERE 
+	 		merchant_index_id IN
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	 </select>  
+	 
+	 <insert id="saveMerchantIndexMapping" parameterType="advMappingModel">
+		INSERT INTO merchant_index_area_mapping(
+			merchant_index_id,
+			area_id,
+			create_time,
+			creator
+		) VALUES
+		<foreach collection="list" item="item" index="index"  separator="," >
+			(
+				#{item.merchantIndexId},
+				#{item.areaId},
+				NOW(),
+				#{item.creator}
+			)			
+		</foreach>	
+	</insert>
+
+	<select id="listAreaName" resultType="Area">
+		SELECT 
+			a.area_id areaID,
+			a.area_name areaName
+		FROM 
+			conf_area a, merchant_index_area_mapping m
+		WHERE 
+			m.merchant_index_id = #{merchantIndexId} AND a.area_id = m.area_id
+	</select>
+	
+	<delete id="delMerchantIndexAreaMapping" parameterType="int">
+		DELETE FROM
+			merchant_index_area_mapping
+		WHERE
+			merchant_index_id = #{merchantIndexId}
+	</delete>
+
+</mapper>

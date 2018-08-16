@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace value ： 实现的DAO接口的路径 -->
+<mapper namespace="com.eastcompeace.config.area.AreaDao">
+	<resultMap type="Area" id="areaMap">
+		<!-- conf_area表与实体类映射字段 -->
+		<result column="area_id" property="areaID" />
+		<result column="area_name" property="areaName" />
+		<result column="full_name" property="fullName" />
+		<result column="province" property="provinceCode" />
+		<result column="city" property="cityCode" />
+		<result column="town" property="townCode" />
+	</resultMap>
+	
+	<select id="queryAreaList" resultMap="areaMap">
+		SELECT
+			area_id,
+			area_name,
+			full_name,
+			province,
+			city,
+			town
+		FROM
+			conf_area
+		WHERE 
+			1=1
+			<if test="areaNameSearch!=null and areaNameSearch!='' ">
+				AND area_name LIKE CONCAT('%',#{areaNameSearch},'%')
+			</if>
+		ORDER BY
+		 	area_id
+	</select>
+	
+	<select id="selectProvinceList" resultMap="areaMap">
+		SELECT
+			t.area_id,
+			t.area_name,
+			t.full_name,
+			t.province,
+			t.city,
+			t.town
+		FROM conf_area t
+		GROUP BY t.province
+	</select>
+	
+	<select id="selectCityList" resultMap="areaMap">
+		SELECT
+			t.area_id,
+			t.area_name,
+			t.full_name,
+			t.province,
+			t.city,
+			t.town
+		FROM conf_area t
+		WHERE t.province = #{province} 
+		AND t.city != '00' 
+		GROUP BY t.city
+	</select>
+	
+	<select id="selectTownList" resultMap="areaMap">
+		SELECT
+			t.area_id,
+			t.area_name,
+			t.full_name,
+			t.province,
+			t.city,
+			t.town
+		FROM conf_area t
+		WHERE t.province = #{province}  
+		AND t.city = #{city}
+		AND t.town != '00'
+	</select>
+	
+	<select id="selectTownList2" resultMap="areaMap">
+		SELECT
+			t.area_id,
+			t.area_name,
+			t.full_name,
+			t.province,
+			t.city,
+			t.town
+		FROM conf_area t
+		WHERE t.province = #{province}  
+		AND LEFT(t.area_id, 4) = LEFT(#{city}, 4)
+		AND t.town != '00'
+	</select>
+	
+	<select id="selectTownList3" resultMap="areaMap">
+		SELECT
+			t.area_id,
+			t.area_name,
+			t.full_name,
+			t.province,
+			t.city,
+			t.town
+		FROM conf_area t
+		WHERE t.province = #{province}  
+		AND t.area_id = #{city}
+		AND t.town != '00'
+	</select>
+	
+	<insert id="addAreaInfo" parameterType="Area">
+		INSERT INTO
+			conf_area(
+				area_id,
+				area_name,
+				full_name,
+				province,
+				city,
+				town
+			)
+		VALUES(
+			#{areaID},
+			#{areaName},
+			#{fullName},
+			#{provinceCode},
+			#{cityCode},
+			#{townCode}
+		)
+	</insert>
+	
+	<update id="updateAreaInfo" parameterType="Area">
+		UPDATE 
+			conf_area
+		SET
+			area_name=#{areaName},
+			full_name=#{fullName}
+		WHERE
+			area_id=#{areaID}
+	</update>
+	
+	<delete id="delAreaInfo" parameterType="string">
+		DELETE FROM
+			conf_area
+		WHERE
+			area_id=#{areaID}
+	</delete>
+	
+	<select id="queryAreaIdAndFullNameList" resultType="map">
+		SELECT
+			area_id AS areaId,
+			full_name AS areaFullName
+		FROM
+			conf_area
+		ORDER BY
+			area_id
+	</select>
+	
+	<select id="queryAreaName" resultType="String">
+		SELECT
+			area_name
+		 FROM
+			conf_area
+		WHERE
+			area_id=#{0}
+	</select>
+</mapper>

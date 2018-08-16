@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eastcompeace.merchant.info.MerchantInfoDao">
+	
+	<resultMap id="MerchantInfoMap" type="MerchantInfo" >
+	    <id column="merchant_id" property="merchantId"/>
+	    <result column="area_id" property="areaID"/>
+	    <result column="merchant_name" property="merchantName"/>
+	    <result column="industry_type" property="industryType"/>
+	    <result column="merchant_nature" property="merchantNature"/>
+	    <result column="merchant_chain" property="merchantChain"/>
+	    <result column="merchant_type" property="merchantType"/>
+	    <result column="contacts" property="contacts"/>
+	    <result column="telephone" property="telephone"/>
+	    <result column="address" property="address"/>
+	    <result column="description" property="description"/>
+	    <result column="create_time" property="createTime"/>
+	    <result column="change_time" property="changeTime"/>
+	    <result column="photo_1" property="photo1"/>
+	    <result column="photo_2" property="photo2"/>
+	    <result column="photo_3" property="photo3"/>
+	    <result column="merchant_logo" property="merchantLogo"/>
+	    <result column="lecense_image" property="lecenseImage"/>
+	</resultMap>
+	
+	<select id="selectinfo" resultMap="MerchantInfoMap" parameterType="MerchantInfo">
+		SELECT 
+			min.merchant_id merchantId,
+			min.area_id areaID,
+			min.merchant_name merchantName,
+			min.industry_type industryType,
+			CASE min.merchant_nature 
+			WHEN 0 THEN '直营店'
+			WHEN 1 THEN '连锁店'
+			END merchant_nature,
+			CASE min.merchant_chain 
+			WHEN 0 THEN '总店'
+			WHEN 1 THEN '分店'
+			END merchant_chain,
+			min.merchant_type merchantType,
+			min.contacts contacts,
+			min.telephone telephone, 
+		        min.address address,
+		        min.description description,
+		        min.create_time createTime,
+		        min.change_time changeTime,
+		        min.photo_1 photo1,
+		        min.photo_2 photo2,
+		        min.photo_3 photo3,
+		        min.merchant_logo merchantLogo,
+		        min.lecense_image lecenseImage,
+			t2.full_name areaName,
+			d.code_name industryNote,
+			d2.code_name merchantNote
+		FROM merchant_info MIN
+		LEFT JOIN conf_area t2 ON t2.area_id = min.area_id
+		LEFT JOIN common_code_dict d 
+			ON d.code_value = min.industry_type 
+			AND d.code_type = 'industryType' 
+			AND d.code_valid = 'VALID'
+		LEFT JOIN common_code_dict d2 
+			ON d2.code_value = min.merchant_type 
+			AND d2.code_type = 'merchantType' 
+			AND d2.code_valid = 'VALID'	
+		WHERE 1=1
+	  	<if test="merchantName != null and merchantName !=''" >
+	  		and min.merchant_name like "%"#{merchantName}"%"
+	  	</if>
+	  	<if test="contacts != null and contacts !=''" >
+	  		and min.contacts like "%"#{contacts}"%"
+	  	</if>
+  	</select>
+  	
+  	<select id="query" resultMap="MerchantInfoMap" parameterType="Integer">
+		select 
+			min.merchant_id merchantId,
+			min.area_id areaID,
+			min.merchant_name merchantName,
+			min.industry_type industryType,
+			min.merchant_type merchantType,
+			min.contacts contacts,
+			min.telephone telephone, 
+		    min.address address,
+		    min.description description,
+		    min.create_time createTime,
+		    min.change_time changeTime,
+		    min.photo_1 photo1,
+		    min.photo_2 photo2,
+		    min.photo_3 photo3,
+		    min.merchant_logo merchantLogo,
+		    min.lecense_image lecenseImage,
+			t2.full_name areaName,
+			d.code_name industryNote,
+			d2.code_name merchantNote
+		from merchant_info min
+		left join conf_area t2 on t2.area_id = min.area_id
+		left join common_code_dict d 
+			on d.code_value = min.industry_type 
+			and d.code_type = 'industryType' 
+			and d.code_valid = 'VALID'
+		left join common_code_dict d2 
+			on d2.code_value = min.merchant_type 
+			and d2.code_type = 'merchantType' 
+			and d2.code_valid = 'VALID'	
+  		where min.merchant_id = #{id}
+  	</select>
+  	
+  	<select id="selectMerchantList" resultMap="MerchantInfoMap" parameterType="MerchantInfo">
+		select 
+			t.merchant_id merchantId,
+			t.merchant_name merchantName
+		from merchant_info t
+		where 1=1
+		<if test="areaID != null and areaID !=''" >
+	  		and t.area_id =#{areaID}
+	  	</if>
+	  	<if test="industryType != null and industryType !=''" >
+	  		and t.industry_type =#{industryType}
+	  	</if>
+	  	<if test="merchantNature != null and merchantNature !=''" >
+	  		and t.merchant_nature =#{merchantNature}
+	  	</if>
+	  	<if test="merchantChain != null and merchantChain !=''" >
+	  		and t.merchant_chain =#{merchantChain}
+	  	</if>
+	  	<if test="merchantId != null and merchantId !=''" >
+	  		and SUBSTRING(t.merchant_id, 1, 10) = #{merchantId}
+	  	</if>
+	</select>
+	
+<!-- 	<select id="selectMaxMerchantChainId" resultMap="MerchantInfoMap" parameterType="String"> -->
+<!-- 		SELECT MAX(SUBSTRING(m.merchant_id, 1, 10)) merchantId FROM merchant_info m  -->
+<!-- 		where 1=1 -->
+<!-- 		<if test="industryType != null and industryType !=''" > -->
+<!-- 	  		AND SUBSTRING(m.merchant_id, 7, 2) = #{industryType} -->
+<!-- 	  	</if> -->
+<!-- 	</select> -->
+	
+<!-- 	<select id="selectMaxMerchantDirectId" resultMap="MerchantInfoMap" parameterType="String"> -->
+<!-- 		SELECT MAX(m.merchant_id) merchantId FROM merchant_info m  -->
+<!-- 		WHERE SUBSTRING(m.merchant_id, 9, 2) = '00' -->
+<!-- 		<if test="industryType != null and industryType !=''" > -->
+<!-- 	  		AND SUBSTRING(m.merchant_id, 7, 2) = #{industryType} -->
+<!-- 	  	</if> -->
+<!-- 	</select> -->
+
+	<select id="selectMaxMerchantChainId" resultMap="MerchantInfoMap" parameterType="String">
+		SELECT MAX(SUBSTRING(m.merchant_id, 1, 10)) merchantId FROM merchant_info m 
+		WHERE SUBSTRING(m.merchant_id, 1, 8) = #{areaIndustry}
+	</select>
+	
+	<select id="selectMaxMerchantDirectId" resultMap="MerchantInfoMap" parameterType="String">
+		SELECT MAX(m.merchant_id) merchantId FROM merchant_info m 
+		WHERE SUBSTRING(m.merchant_id, 1, 10) = #{areaIndustryDirect}
+	</select>
+	
+	<select id="selectMaxMerchantChainBranchId" resultMap="MerchantInfoMap" parameterType="String">
+		SELECT MAX(m.merchant_id) merchantId FROM merchant_info m 
+		WHERE SUBSTRING(m.merchant_id, 1, 10) =  #{areaIndustryChain}
+	</select>
+	
+	<select id="selectMerchantHeadList" resultMap="MerchantInfoMap" parameterType="String">
+		SELECT m.merchant_id merchantId, m.merchant_name merchantHeadName FROM merchant_info m 
+		WHERE SUBSTRING(m.merchant_id, 1, 8) = #{areaIndustry}
+		AND SUBSTRING(m.merchant_id, 9, 2) &lt;&gt; '00'
+		AND SUBSTRING(m.merchant_id, 11, 4) = '0000'
+	</select>
+	
+	<select id="queryVipcardList" resultType="vipCard" parameterType="String">
+		select 
+			t.vipcard_id vipcardID,
+			t.citizen_id citizenID,
+			t.merchant_id merchantID,
+			t.vipcard_code vipcardCode,
+			date_format(t.open_time,'%Y.%m.%d') openTime,
+			date_format(t.open_time,'%Y.%m.%d') endTime,
+			CONCAT(LEFT(t2.user_name, 3), '***', RIGHT(t2.user_name, 4)) userName
+		from citizen_vipcard t
+		left join citizen_user t2 on t2.citizen_id = t.citizen_id
+		where t.merchant_id = #{merchantID}
+		<if test="vipcardCode != null and vipcardCode !=''" >
+	  		and t.vipcard_code like CONCAT('%', #{vipcardCode}, '%')
+	  	</if>
+		ORDER BY t.vipcard_id DESC
+	</select>
+	
+	<insert id="insertinfo" useGeneratedKeys="true" parameterType="MerchantInfo">
+	    insert into merchant_info (
+	        merchant_id,
+	    	area_id, 
+	    	merchant_name, 
+	     	industry_type, 
+	     	merchant_type, 
+	     	merchant_nature,
+	     	merchant_chain,
+	     	contacts, 
+	      	telephone, 
+	      	address, 
+	      	merchant_logo, 
+	      	lecense_image, 
+	      	description, 
+	      	create_time,
+	      	photo_1, 
+	      	photo_2, 
+	      	photo_3
+	     ) values ( 
+	     	#{merchantId}, 
+	     	#{areaID}, 
+	     	#{merchantName}, 
+      		#{industryType},
+      		#{merchantType},
+      		#{merchantNature},
+      		#{merchantChain},
+      		#{contacts}, 
+      		#{telephone}, 
+      		#{address},
+      		#{merchantLogo}, 
+      		#{lecenseImage}, 
+      		#{description}, 
+      		NOW(), 
+      		#{photo1}, 
+      		#{photo2}, 
+      		#{photo3}
+      	)
+  </insert>
+  
+  <update id="update" parameterType="MerchantInfo" >
+    	update merchant_info 
+    	set 
+    		<if test="merchantId != null and merchantId !=''" >
+	  			merchant_id = #{merchantId},
+	  		</if>
+    		<if test="areaID != null and areaID !=''" >
+	  			area_id = #{areaID},
+	  		</if>
+    		<if test="merchantName != null and merchantName !=''" >
+		   		merchant_name = #{merchantName},
+	  		</if>
+    		<if test="industryType != null and industryType !=''" >
+				industry_type = #{industryType},
+	  		</if>
+    		<if test="merchantType != null and merchantType !=''" >
+				merchant_type = #{merchantType},
+	  		</if>	
+	  		<if test="merchantNature != null and merchantNature !=''" >
+				merchant_nature = #{merchantNature},
+	  		</if>
+	  		<if test="merchantChain != null and merchantChain !=''" >
+				merchant_chain = #{merchantChain},
+	  		</if>
+    		<if test="contacts != null and contacts !=''" >
+				contacts = #{contacts},
+	  		</if>
+    		<if test="telephone != null and telephone !=''" >
+				telephone = #{telephone},
+	  		</if>
+    		<if test="address != null and address !=''" >
+				address = #{address},
+	  		</if>
+    		<if test="description != null and description !=''" >
+				description = #{description},
+	  		</if>
+    		<if test="photo1 != null and photo1 !=''" >
+				photo_1 = #{photo1},
+	  		</if>
+    		<if test="photo2 != null and photo2 !=''" >
+				photo_2 = #{photo2},
+	  		</if>
+    		<if test="photo3 != null and photo3 !=''" >
+				photo_3 = #{photo3},
+	  		</if>
+    		<if test="merchantLogo != null and merchantLogo !=''" >
+				merchant_logo = #{merchantLogo},
+	  		</if>
+    		<if test="lecenseImage != null and lecenseImage !=''" >
+				lecense_image = #{lecenseImage},
+	  		</if>
+			change_time = NOW()
+		where merchant_id = #{merchantId}
+	</update>
+	
+	<update id="updateDASReturnInfo" parameterType="String">
+    	update merchant_info 
+    	set 
+			send_das_flag = #{sendDasFlag}
+		where merchant_id = #{merchantId}
+	</update>
+  
+  <delete id="delinfo" parameterType="list">
+		delete from merchant_info where merchant_id in
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<select id="queryMerchantByList" parameterType="list" resultMap="MerchantInfoMap">
+		SELECT 		
+			photo_1,
+			photo_2,
+			photo_3	
+		FROM 
+			merchant_info
+		WHERE 
+			merchant_id IN
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="queryBenefitByList"  parameterType="list" resultType="MerchantBenefit">
+		SELECT 		
+			benefit_id AS benefitId,
+			benefit_image AS benefitImage
+		FROM 
+			merchant_benefit
+		WHERE 
+			merchant_id IN
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="queryCouponIdByList" parameterType="list" resultType="string">
+		SELECT 		
+			coupon_id
+		FROM 
+			merchant_coupon
+		WHERE 
+			benefit_id IN
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<delete id="delMerchantVipcardList" parameterType="list">
+		delete from merchant_vipcard where merchant_id in
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<delete id="delCitizenVipcardList" parameterType="list">
+		delete from citizen_vipcard where merchant_id in
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>

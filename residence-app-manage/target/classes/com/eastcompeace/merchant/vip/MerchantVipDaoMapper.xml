@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eastcompeace.merchant.vip.MerchantVipDao">
+	
+	<resultMap id="MerchantVipMap" type="MerchantVip" >
+	    <id column="merchant_vip_id" property="vipcardId"/>
+	    <result column="merchant_id" property="merchantId"/>
+	    <result column="vip_no_type" property="vipNoType"/>
+	    <result column="vip_desc" property="vipDesc"/>
+	    <result column="vip_rule" property="vipRule"/>
+	    <result column="merchant_name" property="merchantName"/>
+	    <result column="create_time" property="createTime"/>
+	    <result column="change_time" property="changeTime"/>
+	    <result column="area_id" property="areaId"/>
+	    <result column="area_name" property="areaName"/>
+	</resultMap>
+	
+	<select id="queryVipInfoList" resultMap="MerchantVipMap" parameterType="MerchantVip">
+		SELECT
+			v.merchant_vip_id,
+			v.merchant_id,
+			CASE v.vip_no_type
+				WHEN '1' THEN '居住证号'
+				WHEN '2' THEN '身份证号'
+				WHEN '3' THEN '银行卡号'
+				WHEN '4' THEN '手机号'
+			END vip_no_type,
+			v.vip_desc,
+			v.vip_rule,
+			DATE_FORMAT(v.create_time,'%Y-%m-%d %H:%i:%s') create_time,
+			DATE_FORMAT(v.change_time,'%Y-%m-%d %H:%i:%s') change_time,
+			i.merchant_name,
+			a.area_id,
+			a.area_name
+		FROM
+			merchant_vipcard v JOIN merchant_info i ON
+			v.merchant_id = i.merchant_id JOIN conf_area a ON
+			i.area_id = a.area_id			
+  		WHERE 
+	  		1=1
+		  	<if test="merchantId != null and merchantId !=''" >
+		  		and v.merchant_id = #{merchantId}		
+		  	</if>
+		  	<if test="merchantName != null and merchantName !=''" >
+		  		and i.merchant_name like CONCAT('%',#{merchantName},'%')		
+		  	</if>
+		  	<if test="areaName != null and areaName !=''" >
+		  		and a.area_name like CONCAT('%',#{areaName},'%')
+		  	</if>
+		  	<if test="vipcardId != null and vipcardId !=''" >
+		  		and v.merchant_vip_id  = #{vipcardId}
+		  	</if>
+  	</select>
+ 	
+ 	<insert id="insertVipInfo" parameterType="MerchantVip">
+ 		INSERT INTO
+ 			merchant_vipcard(
+ 				merchant_id,
+ 				vip_no_type,
+ 				vip_desc,
+ 				vip_rule,
+ 				create_time			
+ 			) VALUES(
+ 				#{merchantId},
+ 				#{vipNoType},
+ 				#{vipDesc},
+ 				#{vipRule},
+ 				NOW()
+ 			)	
+ 	</insert>
+ 	
+ 	<update id="updateVipInfo" parameterType="MerchantVip">
+ 		UPDATE
+ 			merchant_vipcard
+ 		SET
+ 			<if test="merchantId != null and merchantId !=''" >
+	  			merchant_id = #{merchantId},
+	  		</if>
+	  		<if test="vipNoType != null and vipNoType != ''">
+	  			vip_no_type = #{vipNoType},
+	  		</if>
+	  		<if test="vipDesc != null and vipDesc != ''">
+	  			vip_desc = #{vipDesc},
+	  		</if>
+	  		<if test="vipRule != null and vipRule != ''">
+	  			vip_rule = #{vipRule},
+	  		</if>
+	  		change_time = NOW()
+	  	WHERE
+	  		merchant_vip_id = #{vipcardId}
+ 	</update>
+ 	
+ 	<delete id="deleteVipInfoList" parameterType="list">
+ 		DELETE FROM 
+ 			merchant_vipcard 
+ 		WHERE 
+ 			merchant_vip_id 
+ 		IN
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+ 	</delete>
+ 	
+ 	 <delete id="deleteVipMappingList" parameterType="list">
+ 		DELETE FROM 
+ 			citizen_vipcard 
+ 		WHERE 
+ 			merchant_vip_id 
+ 		IN
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+ 	</delete>
+</mapper>

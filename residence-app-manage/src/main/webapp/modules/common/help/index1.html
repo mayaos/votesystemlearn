@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+	<head>
+		<title>功能导航</title>
+		
+		<#include "/public/include/jquery.ftl"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Cache-Control" content="No-cache" />
+		<style type="text/css">
+.menu a {
+	padding: 0 10px;
+	display: block;
+	float: left;
+	color: #08429f;
+	text-decoration: none;
+	font-size: 14px;
+}
+</style>
+	</head>
+	<body>
+		<div class="easyui-layout" border="false" fit="true">
+			<div region="north" split="false"
+				style="height: 93px; padding: 0px; overflow: hidden;">
+				<div class="yq_topbg">
+					<div class="yq_toplogo">
+						${prisonName!''}${projectName!''}
+					</div>
+					<div class="yq_topright">
+						<span> <!-- 
+								<input name="input" type="submit" class="btn_note" id="input" onclick="leftNote()" value="" />
+							 --> <input name="input" type="submit" class="btn_xgmm"
+								id="input" onclick="upPas()" value="" /> <input name="input"
+								type="submit" class="btn_zxdl" id="input" onclick="zx()"
+								value="" /> 
+						</span>
+					</div>
+					<h5 class="timespan" id="time"></h5>
+					<script type="text/javascript">setInterval('time()',1000);</script>
+				</div>
+				<table width="0" border="0" cellpadding="0" cellspacing="0" id="nav">
+					<tr>
+						<!--<td class="navleft"></td> 缩进-->
+						<td>
+							<h3>
+								您好,
+								<span class="chen">${user.acName!''}</span><span>
+									[${user.rolRolename!''}]</span>
+							</h3>
+						</td>
+						<td align="right">
+							<table width="0" border="0" cellpadding="0" cellspacing="0"
+								class="nav01">
+								<tr>
+									<#assign n = DesktopLsist?size/> <#if DesktopLsist??> <#list
+									0..n as i> <#if DesktopLsist[i]??> <#if i lt 6>
+									<td class="${DesktopLsist[i].dtStyle!'ico7'}"></td>
+									<td>
+										<a href="javascript:void(0)"
+											onclick="desktopid('${DesktopLsist[i].dtUuid!''}')"
+											name="desktopItem" id='${DesktopLsist[i].dtUuid}'>${DesktopLsist[i].dtName!''}</a>
+									</td>
+									</#if> </#if> </#list> </#if>
+									<td class="ico7"></td>
+									<td>
+										<a href="javascript:void(0)" onclick="desktopid()">功能导航</a>
+									</td>
+									<#if n gt 6>
+									<td class="ico_more"></td>
+									<td>
+										<a href="javascript:void(0)" id="more">更多</a>
+									</td>
+									</#if>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<#if n gt 6>
+				<div id="desktopConf_more" class="easyui-menu"
+					style="width:80px; height: auto">
+					<#list 7..n as i>
+					<div onclick="desktopid('${DesktopLsist[i-1].dtUuid!''}')" name="desktopItem" id='${DesktopLsist[i-1].dtUuid}'>
+						<a class="${DesktopLsist[i-1].dtStyle!'ico7'}" ></a>${DesktopLsist[i-1].dtName!''}
+					</div>
+					</#list>
+				</div>
+				</#if>
+			</div>
+			<div region="center" border=false style="padding: 1px;">
+				<iframe id="_main" scrolling="auto" frameborder="0" src=""
+					style="width: 100%; height: 99%;"></iframe>
+			</div>
+		</div>
+		<!-- 右键菜单 -->
+		<div id="desktopConf" class="easyui-menu"
+			style="width: 120px; height: auto">
+			<div iconCls="icon-save" id="desktopDef">
+				设为默认桌面
+			</div>
+			<div id="desktopRemove">放入回收站</div>
+			<div>
+			 <span>桌面回收站</span> 
+			<div style="width:150px;">
+			<#if list_Desktop1??>
+			<#list list_Desktop1 as Desktop>
+			<div onclick="inserdesktop('${Desktop.dtUuid!''}')">
+			<a class="${Desktop.dtStyle!'ico7'}"></a>${Desktop.dtName!''}
+			</div>
+			</#list>
+			</#if>
+			</div>
+			</div>
+			<div onclick="Remove()">删除桌面</div>
+		</div>
+		<div class="easyui-dialog" data-options="modal: true, collapsible:false, minimizable: false, iconCls: 'icon-edit',
+				maximizable: false, resizable: false, buttons: '#dlg-buttons'"
+			title="修改密码" style="width: 300px; height: 240px" id="d2"
+			closed="true">
+			<form method="post" id="f2">
+				<table id="upw">
+					<tr height="10">
+						<td>
+							&nbsp;
+						</td>
+					</tr>
+					<tr height="25">
+						<td width="40%" style="text-align: right; padding: 8px;">
+							原密码：
+						</td>
+						<td width="*">
+							<input type="password" name="oldPasWord"
+								class="easyui-validatebox" required="true" id="old" />
+						</td>
+					</tr>
+					<tr height="25">
+						<td style="text-align: right; padding: 8px;">
+							新密码：
+						</td>
+						<td>
+							<input name="newPasWord" type="password" id="new"
+								class="easyui-validatebox" required="true"
+								missingMessage="请填写新密码" />
+						</td>
+					</tr>
+					<tr height="25">
+						<td style="text-align: right; padding: 8px;">
+							确认新密码：
+						</td>
+						<td>
+							<input id="sur" name="surePasWord" type="password"
+								class="easyui-validatebox" required="true"
+								missingMessage="请再次填写新密码"
+								validType="eqPassword['#f2 input[name=newPasWord]']" />
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div id="dlg-buttons">
+			<a onclick="savePas()" class="easyui-linkbutton" id="btnSave" iconCls="icon-ok">保存</a>
+			<a onclick="qxPas()" class="easyui-linkbutton" id="btnCancel" iconCls="icon-cancel">取消</a>
+		</div>
+		<div id="open_window"></div>
+	</body>
+</html>
+<script type="text/javascript">
+	bindEvent();
+	var desktopId;
+	$('[name=desktopItem]').bind('contextmenu',function(e){
+			e.preventDefault();
+			$('#desktopConf').menu('show',{  
+				left: e.pageX,
+				top: e.pageY
+			});
+			desktopId=$(this).attr('id')
+	});
+	$('#more').bind('click',function(e){
+			e.preventDefault();
+			$('#desktopConf_more').menu('show',{  
+				left: e.pageX,
+				top: e.pageY
+			});
+	});
+	function desktopid(id){
+   		if(id){		// 汇总统计
+   			document.getElementById('_main').src='jfp_desktop!return_desktop.action?jfpDesktop.dtUuid='+id;
+   		}else{		// 功能导航
+   			// document.getElementById('_main').src = '${base}/fpms2/depktop/main.jsp';
+   			document.getElementById('_main').src = '${base}/login!goMain.action?strMap.height='+$('#_main').css('height');
+   		}
+   	}
+   function Remove(){
+   		ht.msgUtil.confirm('该桌面将永久删除,确定要删除该桌面吗?', function (){
+			$.post('jfp_desaccount!insert1.action',{'jfpDesaccount.daDepid':desktopId},function(data){
+				ht.msgUtil.info(data.message);
+			},'json'); 
+		});
+   }	
+   function	inserdesktop(id){
+   		ht.msgUtil.confirm('确定要还原该桌面吗?', function (){
+			$.post('jfp_desaccount!delete.action',{'jfpDesaccount.daDepid':id},function(data){
+				ht.msgUtil.info(data.message);
+			},'json'); 
+		});
+   }
+//绑定菜单click事件
+	function bindEvent(){
+		
+		// 导航菜单设为快捷键
+		$('#add').bind('click',function(){
+			var node =$('#tt2').tree('getSelected');
+				$.post('fastkey!insert.action',{'fastkey.accountId':$('#accountId').val(),'fastkey.name':node.text,'fastkey.url':node.attributes.url,'fastkey.functionCode':node.id},function(data){
+					$.messager.alert('成功',data.message);
+				},'json');
+		});
+		
+		$('#desktopDef').bind('click',function(){
+				$.post('jfp_account!insert_depid.action',{'jfpAccount.acDepid':desktopId},function(data){
+						ht.msgUtil.info(data.message);
+				},'json');
+		});
+		$('#desktopRemove').bind('click',function(){
+			ht.msgUtil.confirm('确定要屏蔽该桌面吗?', function (){
+				$.post('jfp_desaccount!insert.action',{'jfpDesaccount.daDepid':desktopId},function(data){
+					ht.msgUtil.info(data.message);
+				},'json'); 
+			});
+				
+		});
+	};
+	function  time(){
+		date = new Date().toLocaleString();
+    	$('#time').html(date);
+    	// $('#time').html(new Date().toLocaleString()+' 星期'+'日一二三四五六'.charAt(new Date().getDay()));
+   	}
+   	function  zx(){
+   		window.self.location='${base}/login!logOut.action';
+   	}
+   	function upPas(){
+   		$('#d2').dialog('open');
+   	}
+   	function  savePas(){
+		$('#f2').form('submit',{
+			url:'${base}/login!upPas.action',
+			success:function(data){
+				data=parseJSON(data);
+				if(data.success){
+					ht.msgUtil.info(data.message);
+					$('#f2').form('reset');
+					$('#d2').dialog('close');
+				}else{
+					ht.msgUtil.error(data.message);
+				}
+			}
+		})    		
+  	}
+  	
+   	function  qxPas(){
+   		$('#f2').form('reset');
+   		$('#d2').dialog('close');
+   	}
+$(function() {
+	desktopid('${user.acDepid!''}');
+});
+</script>

@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eastcompeace.pubareaFeature.PubAreaFeatureDao">
+	<resultMap id="pubareaFeatureMap" type="com.eastcompeace.model.PubAreaFeatureModel">
+		<id column="area_feature_id" property="areaFeatureId" />
+		<result column="area_feature_title" property="areaFeatureTitle" />
+		<result column="area_feature_content" property="areaFeatureContent" />
+		<result column="area_feature_from" property="areaFeatureFrom" />
+		<result column="issue_time" property="issueTime" />
+		<result column="read_times" property="readTimes" />
+		<result column="like_times" property="likeTimes" />
+		<result column="area_feature_pic" property="areaFeaturePic" />
+		<result column="user_id" property="userId" />
+			<result column="user_name" property="userName" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="area_feature_desc" property="areaFeatureDesc" />
+	</resultMap>
+	<select id="selAreaFeature" resultMap="pubareaFeatureMap" parameterType="com.eastcompeace.model.PubAreaFeatureModel">
+		select
+			pt.area_feature_id areaFeatureId,
+			pt.area_feature_title areaFeatureTitle,
+			pt.area_feature_content areaFeatureContent,
+			pt.area_feature_from areaFeatureFrom,
+			date_format( pt.issue_time  ,'%Y-%m-%d ')  issueTime,
+			pt.read_times readTimes,
+			pt.like_times likeTimes,
+			pt.area_feature_pic areaFeaturePic,
+			pt.user_id userId,
+			pt.area_feature_desc areaFeatureDesc,
+			date_format( pt.create_time  ,'%Y-%m-%d ')  createTime,
+			date_format( pt.update_time  ,'%Y-%m-%d ')  updateTime,
+	        co.USER_NAME userName,
+	        d.code_name areaFeatureType,
+			d.code_value areaFeatureTypeValue,
+			area_feature_bar areaFeatureBar,
+			rank rank
+		from pub_area_feature pt
+			left join common_user co
+			on pt.user_id=co.User_Id
+			LEFT JOIN common_code_dict d 
+			ON d.code_type = 'areaFeatureType'  AND d.code_value = pt.area_feature_type 
+		where 1=1
+		<if test="areaFeatureId != null and areaFeatureId != ''">
+			and pt.area_feature_id = #{areaFeatureId}
+		</if>
+		<if test="areaFeatureType != null and areaFeatureType != ''">
+			and pt.area_feature_type LIKE CONCAT('%',#{areaFeatureType},'%')
+		</if>
+		<if test="areaFeatureTitle != null and areaFeatureTitle != ''">
+			and pt.area_feature_title LIKE  CONCAT('%',#{areaFeatureTitle},'%')
+		</if>
+		<if test="issueTime !=null and issueTime != ''">
+			and pt.issue_time=#{issueTime}
+		</if>
+		<if test="createTime !=null and createTime != ''">
+			and date_format( pt.create_time  ,'%Y-%m-%d') = #{createTime}
+		</if>
+		<if test="areaFeatureBar !=null and areaFeatureBar != ''">
+			and area_feature_bar = #{areaFeatureBar}
+		</if>	
+		order by rank	
+	</select>
+
+	<insert id="addAreaFeature" parameterType="com.eastcompeace.model.PubAreaFeatureModel" keyProperty="areaFeatureId">
+		<selectKey keyProperty='areaFeatureId' resultType='int' order='AFTER'  >  
+        	select LAST_INSERT_ID();  
+    	</selectKey>  
+		insert into pub_area_feature
+		(
+		<if test="areaFeatureType != null and areaFeatureType != ''">
+		area_feature_type
+		</if>
+		<if test="areaFeatureTitle != null and areaFeatureTitle != ''">
+		,area_feature_title
+		</if>
+		<if test="areaFeatureContent != null and areaFeatureContent != ''">
+		,area_feature_content
+		</if>
+		<if test="areaFeatureFrom != null and areaFeatureFrom!= '' ">
+		,area_feature_from
+		</if>
+		<if test="issueTime != null and issueTime != ''">
+		,issue_time
+		</if>
+		<if test="areaFeaturePic != null and areaFeaturePic != ''">
+		,area_feature_pic
+		</if>
+		<if test="userId != null and userId != ''">
+		,user_id
+		</if>
+		<if test="createTime != null and createTime != ''">
+		,create_time
+		</if>
+		<if test="areaFeatureDesc != null and areaFeatureDesc  != ''">
+		,area_feature_desc
+		</if>
+		<if test="rank != null and rank  != ''">
+		,rank
+		</if>		
+		)
+		value(
+		<if test="areaFeatureType != null and areaFeatureType != ''">
+		#{areaFeatureType}
+		</if>
+		<if test="areaFeatureTitle != null and areaFeatureTitle != ''">
+		,#{areaFeatureTitle}
+		</if>
+		<if test="areaFeatureContent != null and areaFeatureContent != ''">
+		,#{areaFeatureContent}
+		</if>
+		<if test="areaFeatureFrom != null and areaFeatureFrom != ''">
+		,#{areaFeatureFrom}
+		</if>
+		<if test="issueTime != null and issueTime != ''">
+		,#{issueTime}
+		</if>
+		<if test="areaFeaturePic != null and areaFeaturePic != ''">
+		,#{areaFeaturePic}
+		</if>
+		<if test="userId != null and userId != ''">
+		,#{userId}
+		</if>
+		<if test="createTime != null and createTime != ''">
+		,#{createTime}
+		</if>
+		<if test="areaFeatureDesc != null and areaFeatureDesc  != ''">
+		,#{areaFeatureDesc}
+		</if>
+		<if test="rank != null and rank  != ''">
+		,#{rank}
+		</if>		
+		)
+	</insert>
+	
+	<delete id="delAreaFeature" parameterType="list">
+		delete from pub_area_feature where area_feature_id in
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	<update id="editAreaFeature" parameterType="com.eastcompeace.model.PubAreaFeatureModel">
+		update pub_area_feature set
+		<if test="areaFeatureTitle !=null and areaFeatureTitle != ''">
+				area_feature_title=#{areaFeatureTitle}
+		</if>
+		<if test="areaFeatureContent !=null and areaFeatureContent != ''">
+				,area_feature_content=#{areaFeatureContent}
+		</if>
+		<if test="areaFeatureFrom !=null and areaFeatureFrom != ''">
+				,area_feature_from =#{areaFeatureFrom}
+		</if>
+		
+		<if test="areaFeaturePic !=null and areaFeaturePic != ''">
+				,area_feature_pic=#{areaFeaturePic}
+		</if>
+		<if test="updateTime !=null and updateTime != ''">
+				,update_time=#{updateTime}
+		</if>
+		<if test="areaFeatureDesc != null and areaFeatureDesc != ''">
+				,area_feature_desc = #{areaFeatureDesc}
+		</if>
+		<if test="areaFeatureType != null and areaFeatureType != ''">
+				,area_feature_type = #{areaFeatureType}
+		</if>
+		<if test="rank != null and rank != ''">
+				,rank = #{rank}
+		</if>		
+		where area_feature_id=#{areaFeatureId}
+	</update>
+	<!-- 设置置顶 -->
+	<update id="updateBar" parameterType="list">
+		update 
+			pub_area_feature 
+		set 
+			area_feature_bar="1"
+		where
+			area_feature_id in 
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	<!-- 取消置顶 -->
+	<update id="removeBar" parameterType="list">
+		update 
+			pub_area_feature 
+		set 
+			area_feature_bar="0"
+		where
+			area_feature_id in 
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>		
+	<select id="querycontent" resultMap="pubareaFeatureMap" parameterType="java.lang.String">
+		SELECT t.area_feature_content FROM pub_area_feature t WHERE t.area_feature_id = #{1}
+	</select>
+	   
+	 <select id="queryAreaFeaturePic" resultMap="pubareaFeatureMap" parameterType="list">
+	 	SELECT
+	 		area_feature_id,
+	 		area_feature_pic
+	 	FROM 
+	 		pub_area_feature 
+	 	WHERE 
+	 		area_feature_id IN
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	 </select>  
+	 
+	 <insert id="saveAreaFeatureMapping" parameterType="advMappingModel">
+		INSERT INTO area_feature_area_mapping(
+			area_feature_id,
+			area_id,
+			create_time,
+			creator
+		) VALUES
+		<foreach collection="list" item="item" index="index"  separator="," >
+			(
+				#{item.areaFeatureId},
+				#{item.areaId},
+				NOW(),
+				#{item.creator}
+			)			
+		</foreach>	
+	</insert>
+
+	<select id="listAreaName" resultType="Area">
+		SELECT 
+			a.area_id areaID,
+			a.area_name areaName
+		FROM 
+			conf_area a, area_feature_area_mapping m
+		WHERE 
+			m.area_feature_id = #{areaFeatureId} AND a.area_id = m.area_id
+	</select>
+	
+	<delete id="delAreaFeatureAreaMapping" parameterType="int">
+		DELETE FROM
+			area_feature_area_mapping
+		WHERE
+			area_feature_id = #{areaFeatureId}
+	</delete>
+</mapper>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace value ： 实现的DAO接口的路径 -->
+<mapper namespace="com.eastcompeace.system.codedict.CodedictDao">
+
+	<!-- resultMap:定义结果集中表字段与实体类属性的映射关系 -->
+	<resultMap type="Codedict" id="CodedictMap">
+		<!-- common_code_dict表与实体类映射字段 -->
+		<result column="code_type" property="codeType" />
+		<result column="code_type_name" property="codeTypeName" />
+		<result column="code_name" property="codeName" />
+		<result column="code_value" property="codeValue" />
+		<result column="code_order" property="codeOrder" />
+		<result column="code_valid" property="codeValid" />
+		<result column="code_date" property="codeDate" />
+		<result column="code" property="code" />
+	</resultMap>
+	
+	<select id="queryCodeList" resultMap="CodedictMap" parameterType="Codedict">
+		SELECT 
+			t.code_type codeType,
+			t.code_type_name codeTypeName,
+			t.code_name codeName,
+			t.code_value codeValue,
+			t.code_order codeOrder,
+			t.code_valid codeValid,
+			case t.code_valid 
+			when 'VALID' then '有效'
+			when 'INVALID' then  '无效'
+			end codeValidVal,
+			t. code_date codeDate
+		FROM 
+			common_code_dict  t
+		WHERE
+			1=1
+			<if test="codeType!=null and codeType!=''">
+				AND t.code_type LIKE CONCAT('%',#{codeType},'%') 
+		    </if>
+		    <if test="codeTypeName!=null and codeTypeName!=''">
+			    AND t.code_type_name LIKE CONCAT('%',#{codeTypeName},'%') 
+		    </if>
+		    <if test="codeName!=null and codeName!=''">
+			    AND t.code_name LIKE CONCAT('%',#{codeName},'%') 
+		    </if>		
+		ORDER BY 
+			t.code_type_name, t.code_order ASC
+	</select>
+	
+	<insert id="insertCodeInfo" parameterType="Codedict">
+		insert into common_code_dict (code_type,code_type_name,code_name,code_value,code_order,code_valid,code_date)
+		values (#{codeType},#{codeTypeName},#{codeName},#{codeValue},#{codeOrder},#{codeValid},#{codeDate})
+	</insert>
+	<update id="updateCodeInfo" parameterType="Codedict">
+		update common_code_dict set
+			code_type=#{codeType},
+			code_type_name=#{codeTypeName},
+			code_name=#{codeName},
+			code_value=#{codeValue},
+			code_order=#{codeOrder},
+			code_valid=#{codeValid},
+			code_date=#{codeDate}
+		where code_type=#{codeType} 
+			and code_value=#{codeValue}
+	</update>
+	<delete id="deleteCodedictInfo" parameterType="String">
+		delete from common_code_dict where  code_type=#{0} 
+			and code_value=#{2}
+	</delete>
+	<select id="selectCodelist" resultType="Codedict" parameterType="java.lang.String">
+		select t.code_value codeValue, t.code_name codeName from common_code_dict t 
+		where t.code_type = #{codeType} and t.code_valid = 'VALID' ORDER BY t.code_order asc
+	</select>
+	
+	<select id="relationSelectList" resultType="Codedict" parameterType="java.lang.String">
+		SELECT 
+			t.code_value codeValue, 
+			t.code_name codeName
+		FROM common_code_dict t 
+		WHERE t.code_type = #{codeType}
+		AND t.code_value LIKE CONCAT(#{relationType}, '__')
+		AND t.code_valid = 'VALID' 
+		ORDER BY t.code_order ASC
+	</select>
+	
+	<select id="queryCodedict" parameterType="Codedict" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			common_code_dict
+		WHERE
+			code_type=#{codeType} AND code_value=#{codeValue}
+	</select>
+</mapper>

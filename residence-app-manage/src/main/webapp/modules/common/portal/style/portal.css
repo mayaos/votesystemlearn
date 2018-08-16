@@ -1,0 +1,255 @@
+/**
+ * CSS for Residence Permit system
+ * Copyright(c) 2015-2016,  qinyong, eastcompeace
+ */
+
+@import url("../../../../resources/styles/global.css");
+
+/** north/top */
+.ui-top {
+	height:90px;
+	background:url(../images/top-bg.gif) repeat-x;
+	overflow:hidden;
+}
+.ui-top .logo {
+	float:left; height:88px; width:350px;
+	background:url(../images/top-left.jpg) no-repeat;
+}
+.ui-top .logo img {
+	margin-top:12px; margin-left:10px;
+}
+.ui-top .nav {
+	float:left;
+}
+.ui-top .nav li {
+	float:left;
+	width:87px; height:88px;
+	text-align:center;
+}
+.ui-top .nav li a {
+	display:block;
+	width:87px; height:88px;
+	-moz-transition:none;
+	transition:background-color 0.3s linear; -moz-transition:background-color 0.3s linear;
+	-webkit-transition:background-color 0.3s linear;
+	-o-transition:background-color 0.3s linear;
+}
+.ui-top .nav li a.selected {
+	background:url(../images/top-nav-bg.png) no-repeat;
+}
+.ui-top .nav li a:hover {
+	display:block;
+	background:#000; background:none repeat scroll 0% 0% rgb(43, 127, 181);
+	color:#fff;
+}
+.ui-top .nav li img {
+	margin-top:10px;
+}
+.ui-top .nav li a {
+	display:block;
+}
+.ui-top .nav a h2 {
+	font-size:14px; color:#d6e8f1;
+}
+.ui-top .nav a:hover h2 {
+	color:#fff;
+}
+.ui-top .right {
+	float:right; height:88px; width:240px;
+	background:url(../images/top-right.jpg) no-repeat right;
+}
+.ui-top .right ul {
+	padding:15px 12px 5px 45px;
+}
+.ui-top .right ul li {
+	float:left;
+	padding-left:9px; padding-right:9px;
+	background:url(../images/top-line.gif) no-repeat right;
+}
+.ui-top .right ul li:last-child {
+	background:none;
+}
+.ui-top .right ul li a {
+	font-size:13px; color:#e9f2f7;
+}
+.ui-top .right ul li a:hover {
+	color:#fff;
+}
+.ui-top .right ul li span {
+	float:left;
+	margin-top:2px; padding-right:3px;
+}
+.ui-top .right .user {
+	float:right; position:relative;
+	height:30px; width:300px;
+	margin-top:10px; margin-right:12px;
+	background:url(../images/top-user-bg.png) repeat-x;
+	border-radius:15px; behavior:url(../images/pie.htc); white-space:nowrap;
+	clear:both;
+}
+.ui-top .right .user span {
+	display:inline-block;
+	padding-left:35px;
+	padding-right:10px;
+	line-height:30px; font-size:14px; color:#b8ceda;
+	background:url(../images/top-user.png) no-repeat 15px 10px;
+}
+.ui-top .right .user b {
+	display:inline-block;
+	width:20px; height:18px;
+	margin-right:13px; margin-top:7px; 
+	text-align:center; font-weight:normal; color:#fff; font-size:14px; line-height:18px;
+	background:url(../images/top-user-msg.png);
+}
+.ui-top .right .user i {
+	display:inline-block;
+	margin-right:10px;
+	font-style:normal; line-height:30px; font-size:14px; color:#b8ceda;
+}
+
+
+/** west/left */
+.ui-left {
+	width:190px;
+}
+.ui-left .menu {
+	width:190px; height:100%;
+	padding:0px; left:0px;
+	/*padding-bottom: 9999px; margin-bottom: -9999px;*/
+	background:url(../images/left-line.gif) repeat-y right;
+	border:0px; overflow-y:auto;
+}
+.ui-left .menu .title{
+	cursor:pointer;
+	background-color: #E0ECFF;
+	background: -webkit-linear-gradient(top,#EFF5FF 0,#E0ECFF 100%);
+	background: -moz-linear-gradient(top,#EFF5FF 0,#E0ECFF 100%);
+	background: -o-linear-gradient(top,#EFF5FF 0,#E0ECFF 100%);
+	background: linear-gradient(to bottom,#EFF5FF 0,#E0ECFF 100%);
+	background-repeat: repeat-x;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#EFF5FF,endColorstr=#E0ECFF,GradientType=0);
+	border-bottom: 1px solid #95B8E7;
+	height:28px; line-height:28px;
+}
+.ui-left .menu .title em {
+	float:left; margin-left:5px;
+	width:25px; height:25px;
+}
+.ui-left .menu .title .icon-01 {
+	background:url(../images/left-icon-01.png) no-repeat 5px 7px;
+}
+.ui-left .menu .title .icon-02 {
+	background:url(../images/left-icon-02.png) no-repeat 5px 7px;
+}
+.ui-left .menu .title .icon-03 {
+	background:url(../images/left-icon-03.png) no-repeat 5px 7px;
+}
+.ui-left .menu .title .icon-04 {
+	background:url(../images/left-icon-04.png) no-repeat 5px 7px;
+}
+.ui-left .menu .title .icon-05 {
+	background:url(../images/left-icon-05.png) no-repeat 5px 7px;
+}
+.ui-left .menu .title .icon-06 {
+	background:url(../images/left-icon-06.png) no-repeat 5px 7px;
+}
+.ui-left .menu .title .icon-07 {
+	background:url(../images/left-icon-07.png) no-repeat 5px 7px;
+}
+.ui-left .menu .title .icon-08 {
+	background:url(../images/left-icon-08.png) no-repeat 5px 7px;
+}
+.ui-left .menu .title .icon-09 {
+	background:url(../images/left-icon-09.png) no-repeat 5px 7px;
+}
+.ui-left .menu .title .icon-folder {
+	background:url('../images/tree_icons.png') no-repeat -208px 0;
+}
+.ui-left .menu .title .icon-file {
+	background: url('../images/tree_icons.png') no-repeat -240px 0;
+}
+.ui-left .menu dd {
+	/*background:url(../images/left-menu-bg.gif) repeat-x;*/
+	line-height:35px; font-weight:bold; font-size:14px;
+	border-right:solid 1px #b7d5df;
+	width:189px;/* ���1���ر߿� */
+}
+.ui-left .menu dd .menuson {
+	display:none;
+}
+.ui-left .menu dd:first-child .menuson {
+	display:block;
+}
+.ui-left .menu dd .menuson {
+	line-height:30px; font-weight:normal;
+}
+.ui-left .menu dd .menuson li {
+	cursor:pointer;
+}
+.ui-left .menu dd .menuson li.active {
+	position:relative;
+	background:url(../images/left-menu-item-bg.png) repeat-x;
+	line-height:30px; color:#000;
+}
+.ui-left .menu dd .menuson li cite {
+	display:block; float:left;
+	width:16px; height:16px;
+	margin-top:7px; margin-left:15px;
+	background:url(../images/left-menu-item-arrow-1.gif) no-repeat;
+}
+.ui-left .menu dd .menuson li.active cite {
+	background:url(../images/left-menu-item-arrow-2.gif) no-repeat;
+}
+.ui-left .menu dd .menuson li.active i {
+	display:block;
+	position:absolute; right:0; top:9px; right:-1px;
+	width:6px; height:11px;
+	background:url(../images/left-menu-item-triangle.png) no-repeat;
+	z-index:10000;
+}
+.ui-left .menu dd .menuson li a {
+	display:block;
+	*display:inline; *padding-top:5px;
+}
+.ui-left .menu dd .menuson li.active a {
+	color:#000;
+}
+
+
+/** east/right */
+.ui-place {
+	height:40px;
+	background:url(../images/right-place-bg.gif) repeat-x;
+}
+.ui-place span {
+	line-height:40px; font-weight:bold;
+	float:left; margin-left:12px;
+}
+.ui-place ul li {
+	float:left;
+	line-height:40px;
+	padding-left:7px; padding-right:12px;
+	background:url(../images/right-place-arrow.gif) no-repeat right;
+}
+.ui-place ul li:last-child {
+	background:none;
+}
+
+.ui-bottom {
+	height:25px;
+	color:#0b3a58; line-height:24px; text-align:center;
+	background-color:#eee; border-top:1px solid #ccc;
+}
+.tab {
+	background:#b5d6e6;
+}
+.tab tr {
+	height:25px;
+	text-align:center; line-height:25px;
+	background:#fff;
+	overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.tab td {
+	padding:1px 5px;
+	background:#fff;
+}

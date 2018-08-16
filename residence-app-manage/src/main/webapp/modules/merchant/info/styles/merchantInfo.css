@@ -1,0 +1,47 @@
+@CHARSET "UTF-8";
+
+/**
+ * CSS for Residence Permit system
+ * Copyright(c) 2015-2016,  qinyong, eastcompeace
+ */
+
+.tab {
+	background:#b5d6e6;
+}
+.tab tr {
+	height:25px;
+	text-align:center; line-height:25px;
+	background:#fff;
+	overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.tab td {
+	padding:1px 5px;
+	background:#fff;
+}
+
+.arrange {
+	margin:0px; padding:5px 0px;
+}
+.arrange .info {
+	padding:3px;
+	height:24px; line-height:24px;
+	border-bottom:1px solid #cfcfcf;
+}
+.arrange .info span {
+	margin:0px 5px;
+	width:150px; 
+	float:left; display:-moz-inline-box; display:inline-block;
+	font-size:12px; text-align:right;
+}
+.arrange .info label {
+	font-size:12px; color:#444;
+}
+.arrange .btns {
+	padding:5px;
+	text-align:center;
+	border-bottom:1px solid #cfcfcf;
+	background:#fafafa;
+}
+.trShowOrNot {
+	
+}

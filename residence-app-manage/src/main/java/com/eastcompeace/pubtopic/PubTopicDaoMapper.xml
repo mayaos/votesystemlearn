@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eastcompeace.pubtopic.PubTopicDao">
+	<resultMap id="pubtopicMap" type="PubTopic">
+		<id column="topic_id" property="topicId" />
+		<result column="topic_title" property="topicTitle" />
+		<result column="topic_content" property="topicContent" />
+		<result column="topic_from" property="topicFrom" />
+		<result column="issue_time" property="issueTime" />
+		<result column="read_times" property="readTimes" />
+		<result column="like_times" property="likeTimes" />
+		<result column="topic_pic" property="topicPic" />
+		<result column="user_id" property="userId" />
+			<result column="user_name" property="userName" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="topic_desc" property="topicDesc" />
+	</resultMap>
+	<select id="seltopic" resultMap="pubtopicMap" parameterType="PubTopic">
+		select
+			pt.topic_id topicId,
+			pt.topic_title topicTitle,
+			pt.topic_content topicContent,
+			pt.topic_from topicFrom,
+			date_format( pt.issue_time  ,'%Y-%m-%d ')  issueTime,
+			pt.read_times readTimes,
+			pt.like_times likeTimes,
+			pt.topic_pic topicPic,
+			pt.user_id userId,
+			pt.topic_desc topicDesc,
+			date_format( pt.create_time  ,'%Y-%m-%d ')  createTime,
+			date_format( pt.update_time  ,'%Y-%m-%d ')  updateTime,
+	        co.USER_NAME userName,
+	        d.code_name topicType,
+			d.code_value topicTypeValue,
+			topic_bar topicBar,
+			rank rank
+		from pub_topic pt
+			left join common_user co
+			on pt.user_id=co.User_Id
+			LEFT JOIN common_code_dict d 
+			ON d.code_type = 'topicType'  AND d.code_value = pt.topic_type 
+		where 1=1
+		<if test="topicId != null and topicId != ''">
+			and pt.topic_id = #{topicId}
+		</if>
+		<if test="topicType != null and topicType != ''">
+			and pt.topic_type LIKE CONCAT('%',#{topicType},'%')
+		</if>
+		<if test="topicTitle != null and topicTitle != ''">
+			and pt.topic_title LIKE  CONCAT('%',#{topicTitle},'%')
+		</if>
+		<if test="issueTime !=null and issueTime != ''">
+			and pt.issue_time=#{issueTime}
+		</if>
+		<if test="createTime !=null and createTime != ''">
+			and date_format( pt.create_time  ,'%Y-%m-%d') = #{createTime}
+		</if>
+		<if test="topicBar !=null and topicBar != ''">
+			and topic_bar = #{topicBar}
+		</if>	
+		order by rank	
+	</select>
+
+	<insert id="addtopic" parameterType="PubTopic" keyProperty="topicId">
+		<selectKey keyProperty='topicId' resultType='int' order='AFTER'  >  
+        	select LAST_INSERT_ID();  
+    	</selectKey>  
+		insert into pub_topic
+		(
+		<if test="topicType != null and topicType != ''">
+		topic_type
+		</if>
+		<if test="topicTitle != null and topicTitle != ''">
+		,topic_title
+		</if>
+		<if test="topicContent != null and topicContent != ''">
+		,topic_content
+		</if>
+		<if test="topicFrom != null and topicFrom!= '' ">
+		,topic_from
+		</if>
+		<if test="issueTime != null and issueTime != ''">
+		,issue_time
+		</if>
+		<if test="topicPic != null and topicPic != ''">
+		,topic_pic
+		</if>
+		<if test="userId != null and userId != ''">
+		,user_id
+		</if>
+		<if test="createTime != null and createTime != ''">
+		,create_time
+		</if>
+		<if test="topicDesc != null and topicDesc  != ''">
+		,topic_desc
+		</if>
+		<if test="rank != null and rank  != ''">
+		,rank
+		</if>		
+		)
+		value(
+		<if test="topicType != null and topicType != ''">
+		#{topicType}
+		</if>
+		<if test="topicTitle != null and topicTitle != ''">
+		,#{topicTitle}
+		</if>
+		<if test="topicContent != null and topicContent != ''">
+		,#{topicContent}
+		</if>
+		<if test="topicFrom != null and topicFrom != ''">
+		,#{topicFrom}
+		</if>
+		<if test="issueTime != null and issueTime != ''">
+		,#{issueTime}
+		</if>
+		<if test="topicPic != null and topicPic != ''">
+		,#{topicPic}
+		</if>
+		<if test="userId != null and userId != ''">
+		,#{userId}
+		</if>
+		<if test="createTime != null and createTime != ''">
+		,#{createTime}
+		</if>
+		<if test="topicDesc != null and topicDesc  != ''">
+		,#{topicDesc}
+		</if>
+		<if test="rank != null and rank  != ''">
+		,#{rank}
+		</if>		
+		)
+	</insert>
+	
+	<delete id="deltopic" parameterType="list">
+		delete from pub_topic where topic_id in
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	<update id="edittopic" parameterType="PubTopic">
+		update pub_topic set
+		<if test="topicTitle !=null and topicTitle != ''">
+				topic_title=#{topicTitle}
+		</if>
+		<if test="topicContent !=null and topicContent != ''">
+				,topic_content=#{topicContent}
+		</if>
+		<if test="topicFrom !=null and topicFrom != ''">
+				,topic_from =#{topicFrom}
+		</if>
+		
+		<if test="topicPic !=null and topicPic != ''">
+				,topic_pic=#{topicPic}
+		</if>
+		<if test="updateTime !=null and updateTime != ''">
+				,update_time=#{updateTime}
+		</if>
+		<if test="topicDesc != null and topicDesc != ''">
+				,topic_desc = #{topicDesc}
+		</if>
+		<if test="topicType != null and topicType != ''">
+				,topic_type = #{topicType}
+		</if>
+		<if test="rank != null and rank != ''">
+				,rank = #{rank}
+		</if>		
+		where topic_id=#{topicId}
+	</update>
+	<!-- 设置置顶 -->
+	<update id="updateBar" parameterType="list">
+		update 
+			pub_topic 
+		set 
+			topic_bar="1"
+		where
+			topic_id in 
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	<!-- 取消置顶 -->
+	<update id="removeBar" parameterType="list">
+		update 
+			pub_topic 
+		set 
+			topic_bar="0"
+		where
+			topic_id in 
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>		
+	<select id="querycontent" resultMap="pubtopicMap" parameterType="java.lang.String">
+		SELECT t.topic_content FROM pub_topic t WHERE t.topic_id = #{1}
+	</select>
+	   
+	 <select id="queryTopicPic" resultMap="pubtopicMap" parameterType="list">
+	 	SELECT
+	 		topic_id,
+	 		topic_pic
+	 	FROM 
+	 		pub_topic 
+	 	WHERE 
+	 		topic_id IN
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	 </select>  
+	 
+	 <insert id="saveTopicMapping" parameterType="advMappingModel">
+		INSERT INTO topic_area_mapping(
+			topic_id,
+			area_id,
+			create_time,
+			creator
+		) VALUES
+		<foreach collection="list" item="item" index="index"  separator="," >
+			(
+				#{item.topicId},
+				#{item.areaId},
+				NOW(),
+				#{item.creator}
+			)			
+		</foreach>	
+	</insert>
+
+	<select id="listAreaName" resultType="Area">
+		SELECT 
+			a.area_id areaID,
+			a.area_name areaName
+		FROM 
+			conf_area a, topic_area_mapping m
+		WHERE 
+			m.topic_id = #{topicId} AND a.area_id = m.area_id
+	</select>
+	
+	<delete id="delTopicAreaMapping" parameterType="int">
+		DELETE FROM
+			topic_area_mapping
+		WHERE
+			topic_id = #{topicId}
+	</delete>
+
+</mapper>

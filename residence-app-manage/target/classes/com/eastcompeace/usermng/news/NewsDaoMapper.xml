@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace value ： 实现的DAO接口的路径 -->
+<mapper namespace="com.eastcompeace.usermng.news.NewsDao">
+
+	<select id="query" resultType="citizenMsg" parameterType="String">
+		select 
+			t.message_id messageID,
+			t.citizen_id citizenID,
+			t.message_title messageTitle,
+			t.message_content messageContent,
+			t.message_status messageStatus,
+			date_format(t.create_time,'%Y-%m-%d %H:%i:%s') createTime
+		from citizen_message t
+		where t.message_id = #{id}
+	</select> 
+	
+	<select id="queryListBy" resultType="citizenMsg" parameterType="Map">
+		select 
+			t.message_id messageID,
+			t2.user_name citizenID,
+			t.message_title messageTitle,
+			t.message_content messageContent,
+			case t.message_status
+			when 0 then '未读'
+			when 1 then '已读'
+			end messageStatus,
+			date_format(t.create_time,'%Y-%m-%d %H:%i:%s') createTime
+		from citizen_message t
+		Left join citizen_user t2 on t2.citizen_id = t.citizen_id
+		<where>
+			<if test="userName !=null and userName !=''">
+				t2.user_name like concat('%', #{userName},'%')
+			</if>
+		    <if test="messageStatus !=null and messageStatus !=''">
+			    and t.message_status=#{messageStatus}
+		    </if>
+		    <if test="startTime !=null and startTime !=''">
+			    and t.create_time between #{startTime} and #{endTime}
+		    </if>
+		</where>
+		ORDER BY t.message_id DESC
+	</select> 
+	
+	<insert id="insert" parameterType="citizenMsg" useGeneratedKeys="true" keyProperty="message_id">
+		insert into citizen_message (
+			citizen_id, 
+			message_title,
+			message_content,
+			message_status, 
+			create_time,
+			message_type
+		) values (
+			#{citizenID},
+			#{messageTitle},
+			#{messageContent},
+			#{messageStatus},
+			now(),
+			#{messageType}
+		)
+	</insert>
+	
+	<update id="update" parameterType="citizenMsg">
+		update citizen_message t
+		<trim prefix="SET" suffixOverrides=","> 
+			<if test="messageStatus != null and messageStatus != ''">
+				t.message_status = #{messageStatus},
+			</if>
+			<if test="messageTitle != null and messageTitle != ''">
+				t.message_title = #{messageTitle},
+			</if>
+			<if test="messageContent != null and messageContent != ''">
+				t.message_content = #{messageContent},
+			</if>
+		</trim>
+		where t.message_id = #{messageID}
+	</update>
+	
+	<delete id="deleteMoreBy" parameterType="List">
+		delete from citizen_message where message_id in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+	    </foreach>
+	</delete>
+	
+</mapper>

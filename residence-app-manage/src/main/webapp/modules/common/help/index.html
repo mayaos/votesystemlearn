@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=7"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>流动人口平台</title>
+<#include "/public/include/jquery.ftl"/>
+<link href="${base}/home/style/css.css" rel="stylesheet" type="text/css"/>
+<link href="${base}/home/style/slide.css" rel="stylesheet" type="text/css"/>
+<link href="${base}/public/css/lhgform.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="${base}/home/js/index.js"></script>
+<script type="text/javascript" src="${base}/home/js/slide.js"></script>
+<script type="text/javascript" src="${base}/fpps/nav/js/base.js"></script>
+<style>
+	.menuNav{ width:213px; height:100%; background:#f2f8fe repeat-x;}
+	.menuNav ul{list-style:none; width:100%;margin:0 auto; padding:10px 0 0 0;}
+	.menuNav ul li{ list-style:none; height:28px; width:80%; line-height:28px; text-indent:40px;}
+	.out {
+	color:#0B5491;font-weight:bold}
+    .over {
+	color: #FF7200;font-weight:bold;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="easyui-layout" fit="true" border="false">
+	<div region="north"style="height:100px; overflow:hidden;" border="false" >
+		<div class="logoarea">
+	    	<div class="logo_left"></div>
+	       <div class="box">
+		<span class="prev"></span>
+		    <div class="slide" id="getfirst">
+				<ul class="seamless" class="table_nav">
+					<#if userAuths??>
+						<#list userAuths as ua>
+							<#if ua.attributes.funType = 'N'>
+								<#assign _width = 60 />	
+								<#if ua.text?length gt 4>
+									<#assign _width = 80 />	
+								</#if>
+								<#assign hasSel = 'logo_td' />
+								<#if ua_index gt 0>
+									<#assign hasSel = ''/>
+								</#if>
+								 <li width="${_width}px" ><a href="##"  val="${ua.id}" onclick="loadNavDiv(this)" name="li_a"  ><img src="${base}/home/style/images/${ua.attributes.funCsscode}.gif"  />${ua.text}</a></li>
+							</#if>
+						</#list>
+					</#if>
+					
+					
+				</ul>
+			</div>
+	    <span class="next"></span>
+</div>
+	    </div>
+	    <div class="banarea">
+	    	<div class="ban_left">您好，${user.acName!''}<span>[${user.rolRolename!''}]</span>
+	    	</div>
+	    	<div style="float:left;width:50%;"><MARQUEE onmouseover="this.stop()" onmouseout="this.start()" class="top_gb">
+						      <span onmouseover="stop()"onmouseout="start();"><font color="#ff600">欢迎使用！</span>
+						    </MARQUEE>
+						    </div>
+	        <div class="ban_right">
+	        <span><a href="javascript:void(0)" onclick="updPwd()">修改密码</a></span><span style="margin-left:40px;"><a href="javascript:void(0)" onclick="doLogout()">退出系统</a></span></div>
+	    </div>
+	</div>
+	<div region="center" border=false style="padding: 1px;">
+<#if userAuths??>
+<#assign model1 = '0' />
+<#list userAuths as ua>
+<#if ua.attributes.funType = 'N'>
+<#if ua.children?size gt 0>
+	<#if model1 = '0'>
+		<div style="width: 100%; height: 100%;" id="nav_model1"></div>
+		<#assign model1 = '1' />
+	</#if>
+<#else>
+		<div style="width: 100%; height: 100%;" id="nav_${ua.id}"></div>
+</#if>
+</#if>
+</#list>
+</#if>
+	</div>
+</div>
+<div style="height:1px;">
+
+<object id="CardReader1" codebase="${base}/public/include/EP_IDCard.CAB#version=1,0,0,6" CLASSID="CLSID:084FA725-6E4F-44FF-A78E-F144762CFC95"
+	width="102" height="126">
+		<OBJECT Name="GT2ICROCX" width="0" height="0" style=""
+			CLASSID="CLSID:11E89B2C-4697-411A-8590-F7CE517C66CA"
+			CODEBASE="${base}/public/include/EP_Camera.CAB#version=1,0,0,2">			
+			</OBJECT>	
+	<param name="_Version" value="65536"/>
+	<param name="_ExtentX" value="2646"/>
+	<param name="_ExtentY" value="1323"/>
+	<param name="_StockProps" value="0"/>
+	</object>
+</div>
+</body>
+</html>
+<script type="text/javascript">
+var mm='';
+var cacheDict = {};
+var cacheDict2 = {};
+var userAuth = {};
+var person_data;
+var obj_pt=document.getElementById("CardReader1");
+var ifadmin = function (){
+	if("${user.acLoginname!''}" == 'admin'){
+		return true;
+	}
+	return false;
+}
+if(${isNumeric}==1){
+updPwd(${isNumeric});
+}
+
+$(function(){
+
+	$.post('${base}/login!getUserFuns.action',{},function(authArrs){
+		if(authArrs.length > 0){
+			for(var ii=0; ii<authArrs.length; ii++) {
+				userAuth[authArrs[ii]['id']] = authArrs[ii];
+				userAuth[authArrs[ii]['id']]['children'] = authArrs[ii].children;
+			}
+			loadNavDiv();
+		}
+	 },'json');
+	var charCode = '';
+	setTimeout(function(){
+		$.post('${base}/jfp_core_dict!getAllDicts.action',{},function(dictArrs){
+			for(var ii=0; ii<dictArrs.length; ii++) {
+				if(dictArrs[ii].crdctLevelCode.length == 3){
+					charCode = dictArrs[ii].crdctCharCode;
+					cacheDict[charCode] = [];
+					cacheDict2[dictArrs[ii].crdctLevelCode] = charCode;
+				}
+				else if(dictArrs[ii].crdctLevelCode.length > 3){
+					cacheDict[cacheDict2[dictArrs[ii].crdctLevelCode.substr( 0, 3)]].push(dictArrs[ii]);
+				}
+			}
+		 },'json');
+	},500);
+});
+function person_card(id,name){
+	$.post('fpps_person!selectuuid.action',{'psUuid':id},function(data){
+		person_data=data;
+	 	$.dialog({
+	        id : 'card_'+id,
+			content:'url:${base}/fpps/card/card_data.jsp',  
+			min   :false,
+			max   :false,
+			title : '人员卡片信息--'+name,
+			width:730,  
+	        height:window.screen.availHeight-300, 
+			init : function() {
+	          setTimeout(function() {lhgdialog.list['card_'+id].zindex();}, 0);
+			}
+		 });
+	 },'json');
+}
+function fw_card(id,name){
+	 $.post('fpps_area_extend!selectByUnid.action',{'areReluuid':id},function(data){
+	 	 house_data=data;
+	 	 $.dialog({
+	        id : 'card_fw'+id,
+	        content:'url:${base}/fpps/managefw/card/card_fw_data.jsp',  
+			//content:'房屋卡片',  
+			min   :false,
+			max   :false,
+			title : '房屋卡片信息--'+name,
+			width:730,  
+	        height:window.screen.availHeight-300, 
+			init : function() {
+	          setTimeout(function() {lhgdialog.list['card_fw'+id].zindex();}, 0);
+			}
+		 });
+	 },'json');
+}
+function stop(){
+}
+function start(){
+}
+</script>

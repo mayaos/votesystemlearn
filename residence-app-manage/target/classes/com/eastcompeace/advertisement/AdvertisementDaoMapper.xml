@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eastcompeace.advertisement.AdvertisementDao">
+	<insert id="saveAdvImgInfo" parameterType="advInfoModel">
+		INSERT INTO 
+			adv_img(
+				uri,
+				adv_desc,
+				redirect_url,
+				valid,
+				creator,
+				create_time
+			) VALUES(
+				#{uri},
+				#{advDesc},
+				#{redirectUrl},
+				#{valid},
+				#{creator},
+				NOW()
+			)		
+	</insert>
+	
+	<select id="getAdvImgInfo" parameterType="advInfoModel" resultType="advInfoModel">
+		SELECT 
+				id,
+				uri,
+				adv_desc advDesc,
+				redirect_url redirectUrl,
+				valid,
+				creator,
+				DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') createTime
+		FROM
+			adv_img
+		<trim prefix="WHERE" prefixOverrides="AND |OR">
+			<if test="id != null and id != ''">
+				id = #{id}
+			</if>
+			<if test="uri != null and uri != ''">
+				and uri = #{uri}
+			</if>
+			<if test="creator != null and creator != ''">
+				and creator = #{creator}
+			</if>
+		</trim>			
+	</select>
+	
+	<insert id="saveAdvMapping" parameterType="advMappingModel">
+		INSERT INTO adv_mapping(
+			img_id,
+			area_id,
+			creator
+		) VALUES
+		<foreach collection="list" item="item" index="index"  separator="," >
+			(
+				#{item.imgId},
+				#{item.areaId},
+				#{item.creator}
+			)			
+		</foreach>	
+	</insert>
+			
+	<select id="queryAdvInfoList" resultType="advInfoModel">
+		SELECT DISTINCT
+				a.id,
+				a.uri,
+				a.adv_desc advDesc,
+				a.redirect_url redirectUrl,
+				CASE a.valid
+					WHEN '1' THEN '是'
+					WHEN '0' THEN '否'
+				END valid,
+				a.creator,
+				DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%s') createTime
+		FROM
+			adv_img a
+		
+			<if test="areaNameSearch != null and areaNameSearch != ''">
+				, adv_mapping m ,conf_area c
+				WHERE
+				c.area_name LIKE CONCAT('%',#{areaNameSearch},'%')
+				AND c.area_id = m.area_id AND m.img_id = a.id
+			</if>	
+	</select>
+	
+	<select id="listAreaName" resultType="Area">
+		SELECT 
+			a.area_id areaID,
+			a.area_name areaName
+		FROM 
+			conf_area a, adv_mapping m
+		WHERE 
+			m.img_id = #{imgId} AND a.area_id = m.area_id
+	</select>
+	
+	<update id="updateAdvImgInfo" parameterType="advInfoModel">
+		UPDATE
+			adv_img
+		SET		 	
+			adv_desc = #{advDesc},
+			redirect_url = #{redirectUrl},
+			valid = #{valid},
+			update_time = NOW()
+		WHERE
+			id = #{id}
+	</update>
+	
+	<delete id="delAdvMapping" parameterType="advInfoModel">
+		DELETE FROM
+			adv_mapping
+		WHERE
+			img_id = #{id}
+	</delete>
+	
+	<delete id="delAdvInfo" parameterType="list">
+		DELETE FROM 
+			adv_img 
+		WHERE id IN
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>

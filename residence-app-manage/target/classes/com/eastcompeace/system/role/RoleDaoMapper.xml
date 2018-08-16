@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace value ： 实现的DAO接口的路径 -->
+<mapper namespace="com.eastcompeace.system.role.RoleDao">
+	<!-- resultMap:定义结果集中表字段与实体类属性的映射关系 -->
+	<resultMap type="Role" id="roleMap">
+		<result property="role_id" column="role_id" />
+		<result property="role_name" column="role_name" />
+		<result property="role_desc" column="role_desc" />
+		<result property="create_date" column="create_date" />
+		<result property="isdefault" column="isdefault" />
+		<result property="disLevel" column="dis_level" />
+	</resultMap>
+
+	<select id="queryForList" parameterType="Role" resultMap="roleMap">
+		SELECT t.role_id, 
+			t.role_name, 
+			t.role_desc,
+			t.create_date,
+			CASE t.isdefault 
+				WHEN 'NO' THEN '否'
+				WHEN 'YES' THEN '是'
+			END isdefault,
+			t.dis_level,
+			d.code_name as disLevelVal
+		FROM common_role t
+		left join common_code_dict d on d.code_value = t.dis_level 
+		where d.code_type='roleLevel' 
+		<if test="role_name != null and role_name != ''">
+			and t.role_name LIKE CONCAT('%', #{role_name},'%')
+		</if>
+		<if test="disLevel &gt; 0">
+			and t.dis_level &gt; #{disLevel}
+		</if>
+		<if test="disLevel &lt; 0">
+			and t.dis_level =-1
+		</if>
+		order by t.role_id asc
+	</select>
+
+	<select id="queryById" parameterType="list" resultMap="roleMap">
+		select * from common_role where role_id in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="query" parameterType="Role" resultMap="roleMap">
+		SELECT 
+			t.role_id, 
+			t.role_name, 
+			t.role_desc,
+			t.create_date,
+			CASE t.isdefault 
+				WHEN 'NO' THEN '否'
+				WHEN 'YES' THEN '是'
+			END isdefault		
+		FROM common_role t
+		where 1=1 
+		<if test="role_name != null and role_name != ''">
+			and t.role_name = #{role_name}
+		</if>
+		order by t.role_id asc
+	</select>
+
+	<update id="update" parameterType="Role">
+		update common_role t set
+		<if test="role_name != null and role_name != ''">
+			t.role_name = #{role_name}
+		</if>
+		<if test="role_desc != null and role_desc != ''">
+			, t.role_desc = #{role_desc}
+		</if>
+		<if test="isdefault != null and isdefault != ''">
+			, t.isdefault = #{isdefault}
+		</if>
+		where t.role_id = #{role_id}
+	</update>
+
+	<insert id="insert" parameterType="Role" useGeneratedKeys="true" keyProperty="id">
+		insert into common_role (
+		<if test="role_name != null and role_name != ''">
+			role_name
+		</if>
+		<if test="role_desc != null and role_desc != ''">
+			, role_desc
+		</if>
+		<if test="create_date != null and create_date != ''">
+			, create_date
+		</if>
+		<if test="isdefault != null and isdefault != ''">
+			, isdefault
+		</if>
+		) values (
+		<if test="role_name != null and role_name != ''">
+			#{role_name}
+		</if>
+		<if test="role_desc != null and role_desc != ''">
+			,#{role_desc}
+		</if>
+		<if test="create_date != null and create_date != ''">
+			, #{create_date}
+		</if>
+		<if test="isdefault != null and isdefault != ''">
+			, #{isdefault}
+		</if>
+		)
+	</insert>
+
+	<delete id="delete" parameterType="list">
+		<!-- 删除角色 -->
+		delete from common_role where role_id in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteRoleMapping" parameterType="list">
+		<!-- 删除角色z对应按钮 -->
+		delete from common_role_mapping where role_id in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteRoleButton" parameterType="list">
+		<!-- 删除角色z对应按钮 -->
+		delete from common_rolebutton_mapping where roleid in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteUserMapping" parameterType="list">
+		<!-- 删除角色 对应用户-->
+		delete from common_user_mapping where role_id in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<select id="querySelectList"  resultMap="roleMap">
+		SELECT t.role_id, t.role_name FROM common_role t
+		order by t.dis_level desc
+	</select>
+	
+</mapper>

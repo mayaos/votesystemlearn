@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eastcompeace.org.article.OrgArticleDao">
+	<resultMap id="orgArticleMap" type="ArticleInfo">
+		<id column="article_id" property="articleId"/>
+	    <result column="menu_id" property="menuId"/>
+	    <result column="article_title" property="articleTitle"/>
+	    <result column="article_author" property="articleAuthor"/>
+	    <result column="topic_pic" property="topicPic"/>
+	    <result column="article_desc" property="articleDesc"/>
+	    <result column="article_content" property="articleContent"/>
+	    <result column="read_times" property="readTimes"/>
+	    <result column="like_times" property="likeTimes"/>
+	    <result column="issue_flag" property="issueFlag"/>
+	    <result column="issue_time" property="issueTime"/>
+	    <result column="user_id" property="userId"/>
+	    <result column="user_code" property="userCode"/>
+	    <result column="create_time" property="createTime"/>
+	    <result column="update_time" property="updateTime"/>
+ 	    <result column="article_type" property="articleType"/>
+	    <result column="article_link" property="articleLink"/>   
+	</resultMap>
+	
+	<select id="queryArticleInfo" resultMap="orgArticleMap" parameterType="ArticleInfo">
+		SELECT 
+			ri.article_id articleId,
+			ri.menu_id menuId,
+			am.menu_name menuName,
+			ri.area_id areaId,
+			ca.area_name areaName,
+			ri.org_id orgId,
+			oi.org_name orgName,
+			ri.article_title articleTitle,
+			ri.article_author articleAuthor,
+			ri.article_from articleFrom,
+			ri.read_times readTimes,
+			ri.like_times likeTimes,
+			CASE ri.issue_flag 
+			WHEN 0 THEN '否'
+			WHEN 1 THEN '是'
+			END issue_flag,
+			ri.user_id userId,
+			u.user_code userCode,
+			DATE_FORMAT( ri.issue_time,'%Y-%m-%d %H:%i:%s') issueTime,		 
+			DATE_FORMAT( ri.create_time,'%Y-%m-%d %H:%i:%s') createTime,
+			DATE_FORMAT( ri.update_time,'%Y-%m-%d %H:%i:%s') updateTime
+			
+		FROM 
+		la_org_article_info ri LEFT JOIN  app_menu am
+		ON am.menu_id=ri.menu_id LEFT JOIN common_user u 
+		ON u.USER_ID = ri.user_id
+		LEFT JOIN conf_area ca
+		ON ri.area_id = ca.area_id
+		LEFT JOIN la_org_info oi
+		ON ri.org_id = oi.org_id
+		WHERE
+			1=1
+		    <if test="articleId!=null and articleId!=''">
+			    AND ri.article_id=#{articleId} 
+		    </if>
+		    <if test="menuId!=null and menuId!=''">
+			    AND ri.menu_id=#{menuId}
+		    </if>
+		    <if test="areaId!=null and areaId!=''">
+			    AND ri.area_id=#{areaId}
+		    </if>
+		    <if test="articleTitle!=null and articleTitle!=''">
+		    	AND ri.article_title LIKE CONCAT('%',#{articleTitle},'%')
+		    </if>
+		    <if test="articleAuthor!=null and articleAuthor!=''">
+		    	AND ri.article_author = #{articleAuthor}
+		    </if>
+		     <if test="issueFlag!=null and issueFlag!=''">
+		    	AND ri.issue_flag=#{issueFlag}
+		    </if>
+		    <if test="userId!=null and userId!=''">
+		    	AND ri.user_id=#{userId}
+		    </if>
+		    <if test="issueTime!=null and issueTime!=''">
+		    	AND ri.issue_time=#{issueTime}
+		    </if>
+		ORDER BY  ri.update_time DESC , ri.article_id asc
+	</select>
+	<insert id="addArticleInfo" parameterType="ArticleInfo">
+		INSERT INTO
+		la_org_article_info
+		(
+			menu_id,
+			area_id,
+			org_id,
+			article_title,
+			article_author,
+			article_from,
+			topic_pic,
+			article_desc,
+			article_content,
+			user_id,
+			issue_time,
+			create_time,
+			article_type,
+			article_link
+			) 
+		VALUES(
+			#{menuId},
+			#{areaId},
+			#{orgId},
+			#{articleTitle},
+			#{articleAuthor},
+			#{articleFrom},
+			#{topicPic},
+			#{articleDesc},
+			#{articleContent},
+			#{userId},
+			#{issueTime},
+			NOW(),
+			#{articleType},
+			#{articleLink}
+			)
+	</insert>
+	
+	<select id="queryArticleContent" resultMap="orgArticleMap" parameterType="string">
+		SELECT 
+			article_content 
+		FROM 
+			la_org_article_info  
+		WHERE 
+			article_id = #{0}
+	</select>
+	
+	<select id="queryArticleDetailInfo" resultMap="orgArticleMap" parameterType="ArticleInfo">
+		SELECT 
+			ri.article_id articleId,
+			ri.menu_id menuId,
+			ri.area_id areaId,
+			ca.area_name areaName,
+			ri.org_id orgId,
+			ri.article_title articleTitle,
+			ri.article_author articleAuthor,
+			ri.article_from articleFrom,
+			ri.topic_pic topicPic,
+			ri.article_desc articleDesc,
+			ri.article_content articleContent,
+			ri.read_times readTimes,
+			ri.like_times likeTimes,
+			ri.issue_flag issueFlag,
+			ri.user_id userId,
+			ri.article_type articleType,
+			ri.article_link articleLink,
+			DATE_FORMAT( ri.issue_time,'%Y-%m-%d %H:%i:%s') issueTime,		 
+			DATE_FORMAT( ri.create_time,'%Y-%m-%d %H:%i:%s') createTime,
+			DATE_FORMAT( ri.update_time,'%Y-%m-%d %H:%i:%s') updateTime,
+			u.USER_CODE userCode,
+			am.menu_name menuName
+		FROM 
+			la_org_article_info  ri LEFT JOIN  app_menu am
+		ON am.menu_id=ri.menu_id LEFT JOIN common_user u 
+		ON u.USER_ID = ri.user_id
+		LEFT JOIN conf_area ca
+		ON ri.area_id = ca.area_id
+		WHERE 
+			article_id = #{0}
+	</select>
+	
+	<update id="updateArticleInfo" parameterType="ArticleInfo">
+	UPDATE 
+		la_org_article_info
+	SET 
+		<trim suffixOverrides=",">
+			<if test="menuId!=null and menuId!=''">
+				menu_id = #{menuId},
+			</if>
+			<if test="areaId!=null and areaId!=''">
+				area_id = #{areaId},
+			</if>
+			<if test="orgId!=null and orgId!=''">
+				org_id = #{orgId},
+			</if>
+			<if test="articleTitle!=null and articleTitle!=''">
+				article_title = #{articleTitle},
+			</if>
+			<if test="articleAuthor!=null and articleAuthor!=''">
+				article_author = #{articleAuthor},
+			</if>
+			<if test="articleFrom!=null and articleFrom!=''">
+				article_from = #{articleFrom},
+			</if>
+			<if test="topicPic!=null and topicPic!=''">
+				topic_pic = #{topicPic},
+			</if>
+			<if test="articleDesc!=null and articleDesc!=''">
+				article_desc = #{articleDesc},
+			</if>
+			<if test="articleContent!=null and articleContent!=''">
+				article_content = #{articleContent},
+			</if>
+			<if test="issueTime!=null and issueTime!=''">
+				issue_time = #{issueTime},
+			</if>
+			<if test="articleType!=null and articleType!=''">
+				article_type = #{articleType},
+			</if>
+			<if test="articleLink!=null and articleLink!=''">
+				article_link = #{articleLink},
+			</if>						
+			update_time = NOW()
+		</trim>	
+	 WHERE 
+	    article_id = #{articleId}
+	</update>
+	
+	<update id="releaseArticleInfo" parameterType="list">
+		UPDATE la_org_article_info la
+		SET la.issue_flag = '1',
+		issue_time = NOW()
+		WHERE article_id in
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<update id="delreleaseArticleInfo" parameterType="list">
+		UPDATE la_org_article_info la
+		SET la.issue_flag = '0',
+		issue_time = NOW()
+		WHERE article_id in
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>	
+	<delete id="delArticleInfo" parameterType="list">
+		delete from la_org_article_info where article_id in
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<select id="queryInfoByList" resultMap="orgArticleMap" parameterType="list">
+		SELECT 
+			ri.article_id articleId,
+			ri.menu_id menuId,
+			ri.area_id areaId,
+			ri.org_id orgId,
+			ri.article_title articleTitle,
+			ri.topic_pic topicPic,
+			ri.article_author articleAuthor,
+			ri.read_times readTimes,
+			ri.like_times likeTimes,
+			CASE ri.issue_flag 
+			WHEN 0 THEN '否'
+			WHEN 1 THEN '是'
+			END issue_flag,
+			ri.user_id userId,
+			date_format( ri.issue_time,'%Y-%m-%d %H:%i:%s') issueTime,		 
+			date_format( ri.create_time,'%Y-%m-%d %H:%i:%s') createTime,
+			date_format( ri.update_time,'%Y-%m-%d %H:%i:%s') updateTime,
+			u.USER_CODE userCode,
+			am.menu_name menuName
+		FROM 
+		la_org_article_info ri LEFT JOIN  app_menu am
+		ON am.menu_id=ri.menu_id LEFT JOIN common_user u 
+		ON u.USER_ID = ri.user_id
+		WHERE
+			article_id IN
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+</mapper>

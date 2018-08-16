@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace value ： 实现的DAO接口的路径 -->
+<mapper namespace="com.eastcompeace.config.software.SoftwareDao">
+	<resultMap type="Software" id="softwareMap">
+		<!-- conf_app_soft表与实体类映射字段 -->
+		<result column="soft_id" property="softId" />
+		<result column="soft_version" property="softVersion" />
+		<result column="soft_name" property="softName" />
+		<result column="soft_type" property="softType" />
+		<result column="soft_size" property="softSize" />
+		<result column="soft_url" property="softURL" />		
+		<result column="force_upgrade" property="forceUpgrade" />
+		<result column="create_time" property="createTime" />
+		<result column="soft_notes" property="softNotes" />
+		<result column="soft_hash" property="softHash" />
+	</resultMap>
+	
+	<select id="querySoftwareList" resultMap="softwareMap" parameterType="map">
+		SELECT
+			soft_id,
+			soft_version,
+			soft_name,
+			soft_type,
+			soft_size,
+			soft_url,
+			CASE force_upgrade
+				WHEN  'true' THEN '是'
+				WHEN  'false' THEN '否'
+			END force_upgrade,
+			DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') AS create_time,
+			soft_notes
+		FROM
+			conf_app_soft
+		WHERE
+			1=1
+			<if test="softVersion!=null and softVersion!='' ">
+				AND soft_version LIKE CONCAT('%',#{softVersion},'%')
+			</if>
+			<if test="uploadDateStart!=null and uploadDateStart!='' ">
+				AND DATE_FORMAT(create_time,'%Y-%m-%d') &gt;= #{uploadDateStart}
+			</if>
+			<if test="uploadDateEnd!=null and uploadDateEnd!='' ">
+				AND DATE_FORMAT(create_time,'%Y-%m-%d') &lt;= #{uploadDateEnd}
+			</if>
+		ORDER BY
+		 	soft_id
+	</select>
+	
+	<insert id="addSoftwareInfo" parameterType="Software">
+		INSERT INTO
+			conf_app_soft(
+				soft_id,
+				soft_version,
+				soft_name,
+				soft_type,
+				soft_size,
+				soft_url,
+				force_upgrade,
+				create_time,
+				soft_notes,
+				soft_hash
+			)
+			VALUES(
+				#{softId},	
+				#{softVersion},
+				#{softName},
+				#{softType},
+				#{softSize},
+				#{softURL},
+				#{forceUpgrade},
+				#{createTime},
+				#{softNotes},
+				#{softHash}
+			)	
+	</insert>
+	
+	<delete id="delSoftwareInfo" parameterType="string">
+		DELETE FROM
+			conf_app_soft
+		WHERE
+			soft_id=#{softId}
+	</delete>
+	
+	<select id="querySoftwareByParams" resultType="int" parameterType="map">
+		SELECT
+			COUNT(1)
+		FROM 
+			conf_app_soft
+		WHERE 
+			1=1
+			<if test="softVersion!=null and softVersion!='' ">
+				AND soft_version=#{softVersion}
+			</if>
+			<if test="softType!=null and softType!='' ">
+				AND soft_type=#{softType}
+			</if>
+			<if test="softHash!=null and softHash!='' ">
+				AND soft_hash=#{softHash}
+			</if>
+			<if test="softName!=null and softName!='' ">
+				AND soft_name=#{softName}
+			</if>
+	</select>
+	
+	<select id="queryBySoftTypeAndSoftVersion" resultMap="softwareMap">
+		SELECT
+			soft_id,
+			soft_version,
+			soft_name,
+			soft_type,
+			soft_size,
+			soft_url,
+			CASE force_upgrade
+				WHEN  'true' THEN '是'
+				WHEN  'false' THEN '否'
+			END force_upgrade,
+			DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') AS create_time,
+			soft_notes
+		FROM
+			conf_app_soft
+		WHERE
+			soft_version = #{softVersion} And soft_type = #{softType}			
+	</select>
+	
+	<update id="updateSoftware" parameterType="Software">
+		UPDATE 
+			conf_app_soft
+		SET
+			soft_type = #{softType},
+			force_upgrade = #{forceUpgrade},
+			soft_version=#{softVersion}
+			<if test="softNotes!=null and softNotes!='' ">
+				, soft_notes=#{softNotes}
+			</if>		
+		WHERE
+			soft_id = #{softId}
+	</update>
+</mapper>

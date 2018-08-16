@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace value ： 实现的DAO接口的路径 -->
+<mapper namespace="com.eastcompeace.system.role.RoleMappingDao">
+	<!-- resultMap:定义结果集中表字段与实体类属性的映射关系 -->
+	<resultMap type="RoleMaping" id="RoleMaping">
+		<result property="id" column="id" />
+		<result property="role_id" column="role_id" />
+		<result property="menu_id" column="menu_id" />
+	</resultMap>
+
+	<resultMap type="roleButton" id="roleButtonMap">
+	<result property="id" column="id" />
+	<result property="roleid" column="roleid" />
+	<result property="meunid" column="meunid" />
+	<result property="buttonid" column="buttonid" />
+	</resultMap>
+
+	<select id="getButtonList" parameterType="String" resultMap="roleButtonMap">
+		select t.roleid roleid, t.meunid meunid,t.buttonid buttonid FROM common_rolebutton_mapping t WHERE t.roleid =#{0} AND t.meunid = #{1}
+	</select>
+
+	<select id="queryForList" parameterType="RoleMaping" resultMap="RoleMaping">
+		select * from common_role_mapping t
+		where 1=1
+		<if test="role_id != null and role_id != ''">
+			and t.role_id = #{role_id}
+		</if>
+	</select>
+
+	<insert id="insert" parameterType="list" >
+		insert into common_role_mapping (
+			role_id
+			, menu_id
+		)
+		values
+		<foreach collection="list" item="obj" index="index" separator=",">
+			(#{obj.role_id},#{obj.menu_id})
+		</foreach>
+	</insert>
+
+	<delete id="delete" parameterType="int">
+			delete from common_role_mapping where role_id = #{roleId}
+	</delete>
+	
+	<delete id="deletebutton" parameterType="int">
+			delete from common_rolebutton_mapping where roleid = #{0}
+	</delete>
+	
+	<insert id="insertbutton" parameterType="list" >
+		insert into common_rolebutton_mapping (
+			roleid
+			,meunid
+			,buttonid
+		)
+		values
+		<foreach collection="list" item="obj" index="index" separator=",">
+			(#{obj.roleid},#{obj.meunid},#{obj.buttonid})
+		</foreach>
+	</insert>
+
+</mapper>

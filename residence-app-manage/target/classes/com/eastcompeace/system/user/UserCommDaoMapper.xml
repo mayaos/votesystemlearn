@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace value ： 实现的DAO接口的路径 -->
+<mapper namespace="com.eastcompeace.system.user.UserCommDao">
+
+	<!-- resultMap:定义结果集中表字段与实体类属性的映射关系 -->
+	<resultMap type="userComm" id="userCommMap">
+		<result column="uuid" property="uuid" />
+		<result column="user_id" property="userid" />
+		<result column="type" property="type" />
+		<result column="dis_uuid" property="disuuid" />
+		<result column="comm_uuid" property="commuuid" />
+	</resultMap>
+
+	<insert id="add" parameterType="userComm" useGeneratedKeys="true" keyProperty="id">
+		insert into common_usercomm_mapping (
+		<if test="uuid != null and uuid != ''">
+			uuid
+		</if>
+		<if test="type != null and type != ''">
+			, type
+		</if>
+		<if test="userid != null and userid != ''">
+			, user_id
+		</if>
+		<if test="disuuid != null and disuuid != ''">
+			, dis_uuid
+		</if>
+		<if test="commuuid != null and commuuid != ''">
+			, comm_uuid
+		</if>
+		) values (
+		<if test="uuid != null and uuid != ''">
+			#{uuid}
+		</if>
+		<if test="type != null and type != ''">
+			, #{type}
+		</if>
+		<if test="userid != null and userid != ''">
+			, #{userid}
+		</if>
+		<if test="disuuid != null and disuuid != ''">
+			, #{disuuid}
+		</if>
+		<if test="commuuid != null and commuuid != ''">
+			, #{commuuid}
+		</if>
+		)
+	</insert>
+	
+	<update id="update" parameterType="userComm" >
+		update common_usercomm_mapping 
+		set type = #{type}, dis_uuid = #{disuuid}, comm_uuid = #{commuuid}
+		where user_id = #{userid}
+	</update>
+
+	<select id="query" parameterType="String" resultMap="userCommMap">
+		select * from common_usercomm_mapping where user_id = #{0}
+	</select>
+	
+	<select id="queryByUser" parameterType="String" resultType="userComm">
+		select 
+			uuid, 
+			type, 
+			user_id as userid, 
+			dis_uuid as disuuid, 
+			comm_uuid as commuuid
+		from common_usercomm_mapping 
+		where user_id = #{0}
+	</select>
+	
+	
+	<delete id="delete">
+		delete from common_usercomm_mapping WHERE user_id = #{userId}
+	</delete>
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace value ： 实现的DAO接口的路径 -->
+<mapper namespace="com.eastcompeace.stat.dailyData.DailyDataStatisticsDao">
+	<!-- resultMap:定义结果集中表字段与实体类属性的映射关系 -->
+	<resultMap type="AppDailyData" id="appDailyDataMap">
+		<result property="appDownloadCount" column="app_download_count"/>
+		<result property="activeCount" column="active_count"/>
+		<result property="registeCount" column="registe_count"/>
+		<result property="idAuthCount" column="id_auth_count"/>
+		<result property="rcAuthCount" column="rc_auth_count"/>
+		<result property="interactiveCount" column="interactive_count"/>
+		<result property="recordDate" column="record_date"/>
+	</resultMap>
+	
+	<select id="queryForList" parameterType="AppDailyData" resultMap="appDailyDataMap">
+		SELECT
+			app_download_count,
+			active_count,
+			registe_count,
+			id_auth_count,		
+			rc_auth_count,	
+			interactive_count,
+			DATE_FORMAT(record_date,'%Y-%m-%d') record_date
+		FROM
+			stat_daily_data_app
+		WHERE
+		 	1=1
+		 	<if test="recordDate !=null and recordDate !=''">
+		 		AND record_date = #{recordDate}
+		 	</if>	 	
+		 ORDER BY
+		 	record_date DESC
+	</select>
+</mapper>
+	
